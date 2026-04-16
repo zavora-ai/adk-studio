@@ -1,0 +1,119 @@
+[package]
+name = "adk-studio"
+version = "0.6.1"
+edition = "2024"
+rust-version = "1.85.0"
+license = "Apache-2.0"
+authors = ["James Karanja Maina <james.karanja@zavora.ai>"]
+homepage = "https://www.zavora.ai"
+repository = "https://github.com/zavora-ai/adk-studio"
+description = "Visual development environment for AI agents built with Rust Agent Development Kit (ADK-Rust)"
+keywords = ["ai", "agents", "studio", "visual", "low-code"]
+categories = ["development-tools", "gui"]
+include = [
+  "/src/**/*",
+  "/build.rs",
+  "/templates/**/*",
+  "/ui/dist/**/*",
+  "/README.md",
+  "/LICENSE",
+  "/docs/studio-screenshot.png",
+]
+
+[[bin]]
+name = "adk-studio"
+path = "src/main.rs"
+
+[dependencies]
+# ADK crates — published 0.6.0 from crates.io
+adk-core = "0.6.0"
+adk-agent = "0.6.0"
+adk-model = { version = "0.6.0", features = ["gemini"] }
+adk-tool = "0.6.0"
+adk-runner = "0.6.0"
+adk-session = "0.6.0"
+adk-graph = { version = "0.6.0", features = ["action-full"] }
+adk-action = "0.6.0"
+adk-deploy = "0.6.0"
+adk-code = "0.6.0"
+adk-sandbox = "0.6.0"
+
+# Async
+tokio = { version = "1.40", features = ["full"] }
+async-trait = "0.1"
+futures = "0.3"
+async-stream = "0.3"
+
+# Serialization
+serde = { version = "1.0", features = ["derive"] }
+serde_json = "1.0"
+
+# Web server
+axum = { version = "0.7", features = ["ws"] }
+tower = "0.5"
+tower-http = { version = "0.6", features = ["cors", "fs"] }
+
+# Utilities
+uuid = { version = "1.10", features = ["v4", "serde"] }
+chrono = { version = "0.4", features = ["serde"] }
+thiserror = "2.0"
+anyhow = "1.0"
+dotenvy = "0.15"
+tracing = "0.1"
+tracing-subscriber = { version = "0.3", features = ["env-filter"] }
+lazy_static = "1.4"
+rust-embed = "8"
+mime_guess = "2"
+
+# Code generation
+handlebars = "6"
+
+# HTTP client for notifications and webhooks
+reqwest = { version = "0.12", default-features = false, features = ["json", "stream", "rustls-tls"] }
+
+# Email support
+lettre = { version = "0.11", features = ["tokio1-native-tls", "builder"] }
+base64 = "0.22"
+
+# Database support
+sqlx = { version = "0.8", features = ["runtime-tokio", "any", "postgres", "mysql", "sqlite", "json"] }
+mongodb = "3"
+redis = { version = "0.27", features = ["tokio-comp"] }
+
+# Platform directories
+dirs = "5"
+
+# Encryption (API key management)
+aes-gcm = "0.10"
+hkdf = "0.12"
+sha2 = "0.10"
+rand = "0.8"
+
+# Machine ID
+machine-uid = "0.5"
+
+# Cron expression parsing for schedule triggers
+cron = "0.15"
+
+[dev-dependencies]
+proptest = "1.4"
+tempfile = "3"
+
+[profile.dev]
+debug = 1
+split-debuginfo = "packed"
+incremental = true
+opt-level = 0
+
+[profile.dev.package."*"]
+opt-level = 1
+debug = false
+
+[profile.release]
+strip = true
+opt-level = 3
+lto = true
+
+[package.metadata.docs.rs]
+rustc-args = ["--cfg", "docsrs"]
+rustdoc-args = ["--cfg", "docsrs"]

@@ -1,0 +1,36 @@
+# Build artifacts
+/target/
+ui/dist/
+
+# Dependencies
+ui/node_modules/
+
+# Environment
+.env
+.env.local
+.env.*.local
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# IDE
+.idea/
+.vscode/
+*.swp
+*.swo
+
+# Logs
+*.log
+
+# Lock files (keep Cargo.lock for binary crate, ignore pnpm)
+ui/pnpm-lock.yaml
+
+# Kiro
+ui/.kiro/
+
+# Screenshots (generated)
+ui/screenshots/
+
+# Proptest regressions
+*.proptest-regressions
