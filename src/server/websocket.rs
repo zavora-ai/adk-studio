@@ -123,6 +123,10 @@ async fn stream_response(
         plugin_manager: None,
         run_config: None,
         compaction_config: None,
+        context_cache_config: None,
+        cache_capable: None,
+        request_context: None,
+        cancellation_token: None,
     })?;
 
     let content = Content::new("user").with_text(&req.input);

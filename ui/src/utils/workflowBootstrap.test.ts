@@ -6,7 +6,7 @@ import { createManualTrigger } from '../components/MenuBar/templates';
 function createProject(overrides?: Partial<Project>): Project {
   return {
     id: 'project-1',
-    version: '0.6.0',
+    version: '0.8.0',
     name: 'Test',
     description: '',
     settings: {

@@ -1,7 +1,7 @@
 /**
  * LLM Provider and Model definitions for ADK Studio
  *
- * Updated: April 2026 — aligned with adk-rust 0.6.0 (adk-model 0.6.0)
+ * Updated: May 2026 — aligned with adk-rust 0.8.0 (adk-model 0.8.0)
  * Source: https://lib.rs/crates/adk-model (published March 29, 2026)
  *
  * IMPORTANT: Model IDs must match the exact API identifiers accepted by each provider.

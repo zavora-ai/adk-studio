@@ -34,7 +34,7 @@ pub use validation::{
 use crate::schema::{AgentSchema, AgentType, ProjectSchema, ToolConfig};
 use anyhow::{Result, bail};
 
-const DEFAULT_ADK_VERSION: &str = "0.6.0";
+const DEFAULT_ADK_VERSION: &str = "0.8.0";
 
 /// Detect the LLM provider from a model name string.
 /// Mirrors the TypeScript `detectProviderFromModel()` in `ui/src/data/models.ts`.

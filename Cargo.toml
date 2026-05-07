@@ -1,6 +1,6 @@
 [package]
 name = "adk-studio"
-version = "0.6.1"
+version = "0.8.0"
 edition = "2024"
 rust-version = "1.85.0"
 license = "Apache-2.0"
@@ -25,18 +25,18 @@ name = "adk-studio"
 path = "src/main.rs"
 
 [dependencies]
-# ADK crates — published 0.6.0 from crates.io
-adk-core = "0.6.0"
-adk-agent = "0.6.0"
-adk-model = { version = "0.6.0", features = ["gemini"] }
-adk-tool = "0.6.0"
-adk-runner = "0.6.0"
-adk-session = "0.6.0"
-adk-graph = { version = "0.6.0", features = ["action-full"] }
-adk-action = "0.6.0"
-adk-deploy = "0.6.0"
-adk-code = "0.6.0"
-adk-sandbox = "0.6.0"
+# ADK crates — published 0.8.0 from crates.io
+adk-core = "0.8.0"
+adk-agent = "0.8.0"
+adk-model = { version = "0.8.0", features = ["gemini"] }
+adk-tool = "0.8.0"
+adk-runner = "0.8.0"
+adk-session = "0.8.0"
+adk-graph = { version = "0.8.0", features = ["action-full"] }
+adk-action = "0.8.0"
+adk-deploy = "0.8.0"
+adk-code = "0.8.0"
+adk-sandbox = "0.8.0"
 
 # Async
 tokio = { version = "1.40", features = ["full"] }
