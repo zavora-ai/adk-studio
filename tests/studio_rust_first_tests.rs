@@ -31,6 +31,7 @@ fn llm_agent() -> AgentSchema {
         top_k: None,
         max_output_tokens: None,
         routes: vec![],
+        ..Default::default()
     }
 }
 

@@ -33,7 +33,7 @@ const PROVIDER_KEY_META: Record<string, { name: string; icon: string }> = {
 };
 
 type SettingsScope = 'project' | 'global';
-type SettingsTab = 'general' | 'codegen' | 'ui' | 'env';
+type SettingsTab = 'general' | 'codegen' | 'ui' | 'env' | 'production';
 
 const LATEST_ADK_VERSION = DEFAULT_GLOBAL_SETTINGS.adkVersion;
 const ADK_VERSIONS = [LATEST_ADK_VERSION, '0.4.0', '0.3.2', '0.3.0', '0.2.1', '0.2.0', '0.1.9', '0.1.0'];
@@ -161,6 +161,7 @@ export function SettingsModal({
     { id: 'codegen', label: 'Code Gen', icon: '⚙️' },
     { id: 'ui', label: 'UI', icon: '🎨' },
     { id: 'env', label: 'Environment', icon: '🔐' },
+    { id: 'production', label: 'Production', icon: '🚀' },
   ];
 
   return (
@@ -624,6 +625,67 @@ export function SettingsModal({
                   )}
                 </div>
               </CollapsibleSection>
+            </div>
+          )}
+
+          {activeTab === 'production' && scope === 'project' && (
+            <div className="space-y-4">
+              <div
+                className="p-3 rounded text-xs"
+                style={{ backgroundColor: 'rgba(59, 130, 246, 0.1)', border: '1px solid var(--accent-primary)', color: 'var(--text-secondary)' }}
+              >
+                <div className="font-medium mb-1" style={{ color: 'var(--accent-primary)' }}>🚀 Production Settings</div>
+                <p>Configure production-grade features for your generated code including checkpointing, context management, and skills.</p>
+              </div>
+
+              <CollapsibleSection title="💾 Checkpointing & Context" defaultOpen>
+                <div className="space-y-4">
+                  <Toggle
+                    label="Enable SQLite Checkpointing"
+                    hint="Persist graph execution state to SQLite for crash recovery"
+                    checked={localSettings.sqliteCheckpointer ?? false}
+                    onChange={v => updateProjectSetting('sqliteCheckpointer', v)}
+                  />
+                  <Toggle
+                    label="Enable Context Compaction"
+                    hint="Summarize older conversation events to keep LLM context bounded"
+                    checked={localSettings.contextCompaction ?? false}
+                    onChange={v => updateProjectSetting('contextCompaction', v)}
+                  />
+                </div>
+              </CollapsibleSection>
+
+              <CollapsibleSection title="🧠 Skills" defaultOpen>
+                <div className="space-y-4">
+                  <Field label="Skills Directory" hint="relative path from project root">
+                    <input
+                      type="text"
+                      value={localSettings.skillsDirectory || ''}
+                      onChange={e => updateProjectSetting('skillsDirectory', e.target.value || undefined)}
+                      placeholder="e.g., skills"
+                      className="w-full px-3 py-2 rounded text-sm"
+                      style={{ backgroundColor: 'var(--bg-secondary)', border: '1px solid var(--border-default)', color: 'var(--text-primary)' }}
+                    />
+                  </Field>
+                  <div
+                    className="p-2 rounded text-xs"
+                    style={{ backgroundColor: 'var(--bg-secondary)', color: 'var(--text-muted)' }}
+                  >
+                    💡 Skills are instruction snippets loaded from a directory and injected into agent prompts based on relevance. Use a relative path (e.g., "skills" or "prompts/skills").
+                  </div>
+                </div>
+              </CollapsibleSection>
+            </div>
+          )}
+
+          {activeTab === 'production' && scope === 'global' && (
+            <div className="space-y-4">
+              <div
+                className="p-3 rounded text-xs"
+                style={{ backgroundColor: 'rgba(59, 130, 246, 0.1)', border: '1px solid var(--accent-primary)', color: 'var(--text-secondary)' }}
+              >
+                💡 Production settings are project-specific. Switch to the Project scope to configure checkpointing, context compaction, and skills.
+              </div>
             </div>
           )}
         </div>

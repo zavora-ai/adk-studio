@@ -36,6 +36,10 @@ export interface ProjectSettings {
   showMinimap?: boolean;
   showTimeline?: boolean;
   consolePosition?: 'bottom' | 'right';
+  // Production settings (Work Stream 1 & 5)
+  sqliteCheckpointer?: boolean;
+  contextCompaction?: boolean;
+  skillsDirectory?: string;
 }
 
 export interface AutobuildTriggers {
@@ -74,6 +78,23 @@ export interface AgentSchema {
   // Container-specific
   max_iterations?: number;
   routes?: Route[];
+
+  // Work Stream 2: Agent Properties Extensions
+  tool_timeout_secs?: number;
+  max_llm_iterations?: number;
+  tool_retry_budget?: number;
+  circuit_breaker_threshold?: number;
+  tools_requiring_confirmation?: string[];
+  tool_execution_strategy?: 'sequential' | 'parallel' | 'auto';
+
+  // Work Stream 3: Model-Specific Configuration
+  extended_thinking?: boolean;
+  thinking_budget_tokens?: number;
+  reasoning_effort?: 'low' | 'medium' | 'high';
+  prompt_caching?: boolean;
+
+  // Work Stream 5: Skills
+  auto_skills?: boolean;
 }
 
 export interface Route {

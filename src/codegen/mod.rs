@@ -38,8 +38,30 @@ const DEFAULT_ADK_VERSION: &str = "0.8.0";
 
 /// Detect the LLM provider from a model name string.
 /// Mirrors the TypeScript `detectProviderFromModel()` in `ui/src/data/models.ts`.
-fn detect_provider(model: &str) -> &'static str {
+pub fn detect_provider(model: &str) -> &'static str {
     let m = model.to_lowercase();
+
+    // OpenRouter detection: model contains "/" but doesn't match known provider slash patterns.
+    // This check comes first for slash-containing models to correctly identify OpenRouter format
+    // (e.g., "anthropic/claude-sonnet-4-6", "google/gemini-pro").
+    if model.contains('/') {
+        // Known provider slash patterns — these are NOT OpenRouter
+        if m.contains("accounts/fireworks/") {
+            return "fireworks";
+        }
+        if m.contains("-turbo") && m.contains('/') {
+            return "together";
+        }
+        if model.starts_with("Meta-Llama") || m.starts_with("meta-llama/") {
+            return "sambanova";
+        }
+        if m.starts_with("qwen/") {
+            return "ollama";
+        }
+        // Any other slash-containing model is OpenRouter
+        return "openrouter";
+    }
+
     if m.contains("gemini") || m.contains("gemma") {
         "gemini"
     } else if m.contains("gpt")
@@ -69,18 +91,12 @@ fn detect_provider(model: &str) -> &'static str {
         && !m.contains(':')
     {
         "mistral"
-    } else if m.contains("accounts/fireworks/") {
-        "fireworks"
-    } else if m.contains("-turbo") && m.contains('/') {
-        "together"
     } else if m.contains("cohere-command") || (m.contains("mistral") && m.contains("2024")) {
         "azure-ai"
     } else if m.contains("llama") || m.contains("mixtral") {
         // Ollama-style tags have colons (e.g. "llama3.2:3b")
         if m.contains(':') {
             "ollama"
-        } else if model.starts_with("Meta-Llama") {
-            "sambanova"
         } else if m.starts_with("llama-")
             && m.chars()
                 .nth(6)
@@ -114,7 +130,7 @@ fn collect_providers(project: &ProjectSchema) -> std::collections::HashSet<&'sta
         let p = match dp.as_str() {
             "gemini" | "openai" | "anthropic" | "deepseek" | "groq" | "ollama" | "fireworks"
             | "together" | "mistral" | "perplexity" | "cerebras" | "sambanova" | "bedrock"
-            | "azure-ai" => dp.as_str(),
+            | "azure-ai" | "openrouter" => dp.as_str(),
             _ => "gemini",
         };
         providers.insert(match p {
@@ -131,6 +147,7 @@ fn collect_providers(project: &ProjectSchema) -> std::collections::HashSet<&'sta
             "sambanova" => "sambanova",
             "bedrock" => "bedrock",
             "azure-ai" => "azure-ai",
+            "openrouter" => "openrouter",
             _ => "gemini",
         });
     }
@@ -487,7 +504,15 @@ fn generate_main_rs(project: &ProjectSchema) -> String {
         .any(|a| a.tools.contains(&"browser".to_string()));
 
     // Graph imports
-    code.push_str("use adk_agent::LlmAgentBuilder;\n");
+    let has_router = project
+        .agents
+        .values()
+        .any(|a| a.agent_type == AgentType::Router);
+    if has_router {
+        code.push_str("use adk_agent::{LlmAgentBuilder, LlmConditionalAgent};\n");
+    } else {
+        code.push_str("use adk_agent::LlmAgentBuilder;\n");
+    }
     code.push_str("use adk_core::ToolContext;\n");
     code.push_str("use adk_graph::{\n");
     code.push_str("    edge::{Router, END, START},\n");
@@ -540,6 +565,9 @@ fn generate_main_rs(project: &ProjectSchema) -> String {
     if providers.contains("azure-ai") {
         code.push_str("use adk_model::azure_ai::{AzureAIClient, AzureAIConfig};\n");
     }
+    if providers.contains("openrouter") {
+        code.push_str("use adk_model::openrouter::{OpenRouterClient, OpenRouterConfig};\n");
+    }
     code.push_str(
         "use adk_tool::{FunctionTool, GoogleSearchTool, ExitLoopTool, LoadArtifactsTool};\n",
     );
@@ -556,6 +584,11 @@ fn generate_main_rs(project: &ProjectSchema) -> String {
     }
     if uses_browser {
         code.push_str("use adk_browser::{BrowserSession, BrowserConfig, BrowserToolset};\n");
+    }
+    // Session and runner imports (graph workflows use graph.stream() directly)
+    // Runner is kept as an import for future single-agent mode support
+    if project.settings.sqlite_checkpointer == Some(true) {
+        code.push_str("use adk_checkpointer_sqlite::SqliteCheckpointer;\n");
     }
     code.push_str("use anyhow::Result;\n");
     code.push_str("use serde_json::{json, Value};\n");
@@ -692,6 +725,10 @@ fn generate_main_rs(project: &ProjectSchema) -> String {
         code.push_str("    let azure_ai_api_key = std::env::var(\"AZURE_AI_API_KEY\")\n");
         code.push_str("        .expect(\"AZURE_AI_API_KEY must be set\");\n\n");
     }
+    if providers.contains("openrouter") {
+        code.push_str("    let openrouter_api_key = std::env::var(\"OPENROUTER_API_KEY\")\n");
+        code.push_str("        .expect(\"OPENROUTER_API_KEY must be set\");\n\n");
+    }
 
     // Initialize browser session if any agent uses browser
     let uses_browser = project
@@ -802,8 +839,20 @@ fn generate_main_rs(project: &ProjectSchema) -> String {
         }
     }
 
+    // Collect router target agents — these are built inside the router's LlmConditionalAgent
+    let router_target_agents: std::collections::HashSet<_> = project
+        .agents
+        .iter()
+        .filter(|(_, a)| a.agent_type == AgentType::Router)
+        .flat_map(|(_, a)| a.routes.iter().map(|r| r.target.clone()))
+        .collect();
+
     // Generate all agent nodes with their predecessors
     for agent_id in &top_level {
+        // Skip agents that are targets of a router — they're built inside the router
+        if router_target_agents.contains(*agent_id) {
+            continue;
+        }
         if let Some(agent) = project.agents.get(*agent_id) {
             // Get first predecessor for backward compat (most nodes have exactly one)
             let predecessors = predecessor_map.get(agent_id.as_str());
@@ -811,7 +860,7 @@ fn generate_main_rs(project: &ProjectSchema) -> String {
             let is_parallel = parallel_branch_agents.contains(*agent_id);
             match agent.agent_type {
                 AgentType::Router => {
-                    code.push_str(&generate_router_node(agent_id, agent));
+                    code.push_str(&generate_router_node(agent_id, agent, project));
                 }
                 AgentType::Llm => {
                     code.push_str(&generate_llm_node_v2(
@@ -956,7 +1005,11 @@ fn generate_main_rs(project: &ProjectSchema) -> String {
     ));
 
     // Add all agent nodes
+    // Router target agents are internal to the LlmConditionalAgent, so skip them
     for agent_id in &top_level {
+        if router_target_agents.contains(*agent_id) {
+            continue;
+        }
         code.push_str(&format!("        .add_node({}_node)\n", agent_id));
     }
 
@@ -1154,33 +1207,32 @@ fn generate_main_rs(project: &ProjectSchema) -> String {
             (from, to)
         };
 
-        // Check if source is a router - use conditional edges
+        // Check if source is a router - LlmConditionalAgent handles routing internally
+        // Skip conditional edges for routers (they're no longer needed)
         if let Some(agent) = project.agents.get(&edge.from) {
             if agent.agent_type == AgentType::Router && !agent.routes.is_empty() {
-                // Generate conditional edges for router
-                let conditions: Vec<String> = agent
-                    .routes
-                    .iter()
-                    .map(|r| {
-                        let target = if r.target == "END" {
-                            "END".to_string()
-                        } else {
-                            format!("\"{}\"", r.target)
-                        };
-                        format!("(\"{}\", {})", r.condition, target)
-                    })
-                    .collect();
-
-                code.push_str("        .add_conditional_edges(\n");
-                code.push_str(&format!("            \"{}\",\n", edge.from));
-                code.push_str("            Router::by_field(\"classification\"),\n");
-                code.push_str(&format!("            [{}],\n", conditions.join(", ")));
-                code.push_str("        )\n");
                 continue;
             }
         }
 
+        // Skip edges FROM router target agents (they're internal to the router)
+        if router_target_agents.contains(&edge.from) {
+            continue;
+        }
+
+        // Skip edges TO router target agents (they're internal to the router)
+        if router_target_agents.contains(&edge.to) && edge.from != "START" {
+            continue;
+        }
+
         code.push_str(&format!("        .add_edge({}, {})\n", from, to));
+    }
+
+    // Add direct edge from router to END (LlmConditionalAgent handles routing internally)
+    for (agent_id, agent) in &project.agents {
+        if agent.agent_type == AgentType::Router && !agent.routes.is_empty() {
+            code.push_str(&format!("        .add_edge(\"{}\", END)\n", agent_id));
+        }
     }
 
     // Generate conditional edges for each switch node
@@ -1269,6 +1321,9 @@ fn generate_main_rs(project: &ProjectSchema) -> String {
     }
 
     code.push_str("        .compile()?;\n\n");
+
+    // Note: Graph-based workflows use graph.stream() directly, not Runner.
+    // Runner is for single-agent workflows. The graph handles orchestration.
 
     // Interactive loop with streaming and conversation memory
     code.push_str("    // Get session ID from args or generate new one\n");
@@ -1359,26 +1414,343 @@ fn generate_main_rs(project: &ProjectSchema) -> String {
     code
 }
 
-fn generate_router_node(id: &str, agent: &AgentSchema) -> String {
+/// Generate Runner::builder() typestate pattern code
+///
+/// This function emits the modern Runner::builder() pattern instead of
+/// Runner::new(RunnerConfig { ... }). It conditionally includes:
+/// - SqliteCheckpointer when sqlite_checkpointer is enabled
+/// - EventsCompactionConfig when context_compaction is enabled
+///
+/// # Requirements
+/// - 1.1: Emit Runner::builder() with .app_name(), .agent(), .session_service() chained methods
+/// - 1.2: Conditionally include .artifact_service() or other optional services
+/// - 1.3: Conditionally include .compaction_config() when context_compaction enabled
+/// - 1.4: Terminate with .build()?
+pub fn generate_runner_builder(project: &ProjectSchema, agent_var: &str) -> String {
+    let mut code = String::new();
+
+    code.push_str("    // Build runner using typestate builder pattern (ADK 0.8.0)\n");
+    code.push_str("    let session_service = Arc::new(InMemorySessionService::new());\n");
+    code.push_str("    let runner = Runner::builder()\n");
+    code.push_str(&format!(
+        "        .app_name(\"{}\")\n",
+        project.name
+    ));
+    code.push_str(&format!(
+        "        .agent(Arc::new({}))\n",
+        agent_var
+    ));
+    code.push_str("        .session_service(session_service)\n");
+
+    // Conditionally add compaction config
+    if project.settings.context_compaction == Some(true) {
+        code.push_str("        .compaction_config(EventsCompactionConfig::default())\n");
+    }
+
+    // Terminate with .build()?
+    code.push_str("        .build()?;\n\n");
+
+    code
+}
+
+/// Generate tool execution strategy code for an agent.
+///
+/// Maps the agent's `tool_execution_strategy` field to the corresponding
+/// `ToolExecutionStrategy::` enum variant in generated code.
+///
+/// # Postconditions
+/// - If `agent.tool_execution_strategy` is None or Some("auto"), returns code for `ToolExecutionStrategy::Auto`
+/// - If Some("sequential"), returns `ToolExecutionStrategy::Sequential`
+/// - If Some("parallel"), returns `ToolExecutionStrategy::Parallel`
+/// - For any invalid value, returns `ToolExecutionStrategy::Auto` with a warning comment
+///
+/// **Validates: Requirements 2.1, 2.2, 2.3, 2.4**
+pub fn generate_tool_execution_strategy(agent: &AgentSchema) -> String {
+    match agent.tool_execution_strategy.as_deref() {
+        None | Some("auto") => {
+            "        .tool_execution_strategy(ToolExecutionStrategy::Auto)\n".to_string()
+        }
+        Some("sequential") => {
+            "        .tool_execution_strategy(ToolExecutionStrategy::Sequential)\n".to_string()
+        }
+        Some("parallel") => {
+            "        .tool_execution_strategy(ToolExecutionStrategy::Parallel)\n".to_string()
+        }
+        Some(other) => {
+            format!(
+                "        // WARNING: invalid strategy \"{}\", falling back to Auto\n        .tool_execution_strategy(ToolExecutionStrategy::Auto)\n",
+                other
+            )
+        }
+    }
+}
+
+/// Generate resilience configuration builder method calls for an agent.
+///
+/// Conditionally emits `.tool_timeout()`, `.max_iterations()`, `.tool_retry_budget()`,
+/// and `.circuit_breaker_threshold()` based on which AgentSchema fields are set.
+/// When a field is None, the corresponding builder method call is omitted entirely.
+///
+/// Returns a (possibly empty) string of builder method calls, each indented with 8 spaces.
+///
+/// **Validates: Requirements 4.2, 4.3, 4.4, 4.5, 4.6**
+pub fn generate_resilience_config(agent: &AgentSchema) -> String {
+    let mut code = String::new();
+
+    if let Some(timeout) = agent.tool_timeout_secs {
+        code.push_str(&format!(
+            "        .tool_timeout(Duration::from_secs({}))\n",
+            timeout
+        ));
+    }
+
+    if let Some(max_iter) = agent.max_llm_iterations {
+        code.push_str(&format!("        .max_iterations({})\n", max_iter));
+    }
+
+    if let Some(retry) = agent.tool_retry_budget {
+        code.push_str(&format!("        .tool_retry_budget({})\n", retry));
+    }
+
+    if let Some(threshold) = agent.circuit_breaker_threshold {
+        code.push_str(&format!(
+            "        .circuit_breaker_threshold({})\n",
+            threshold
+        ));
+    }
+
+    code
+}
+
+/// Generate model-specific configuration code for an agent.
+///
+/// For Anthropic models (model contains "claude"):
+/// - If `extended_thinking == Some(true)`, emits `.with_extended_thinking(true)`
+/// - If `thinking_budget_tokens` is set, emits `.with_thinking_budget({value})`
+/// - If `prompt_caching == Some(true)`, emits `.with_prompt_caching(true)`
+///
+/// For OpenAI o-series models (model starts with "o1", "o3", "o4"):
+/// - If `reasoning_effort` is set, emits `.with_reasoning_effort(ReasoningEffort::{Value})`
+///
+/// For all other models, returns empty string regardless of field values.
+///
+/// **Validates: Requirements 7.2, 7.3, 7.4, 8.2, 8.3, 9.2, 9.4**
+pub fn generate_model_config(agent: &AgentSchema) -> String {
+    let mut code = String::new();
+
+    let model = match agent.model.as_deref() {
+        Some(m) => m,
+        None => return code,
+    };
+
+    let provider = detect_provider(model);
+
+    if provider == "anthropic" {
+        // Anthropic-specific configuration
+        if agent.extended_thinking == Some(true) {
+            code.push_str("        .with_extended_thinking(true)\n");
+        }
+        if let Some(budget) = agent.thinking_budget_tokens {
+            code.push_str(&format!("        .with_thinking_budget({})\n", budget));
+        }
+        if agent.prompt_caching == Some(true) {
+            code.push_str("        .with_prompt_caching(true)\n");
+        }
+    } else if provider == "openai" {
+        // Only emit reasoning effort for o-series models
+        let m = model.to_lowercase();
+        let is_o_series = m.starts_with("o1")
+            || m.starts_with("o3")
+            || m.starts_with("o4");
+
+        if is_o_series {
+            if let Some(ref effort) = agent.reasoning_effort {
+                let capitalized = match effort.as_str() {
+                    "low" => "Low",
+                    "medium" => "Medium",
+                    "high" => "High",
+                    _ => "Medium", // default fallback
+                };
+                code.push_str(&format!(
+                    "        .with_reasoning_effort(ReasoningEffort::{})\n",
+                    capitalized
+                ));
+            }
+        }
+    }
+    // For all other providers, return empty string (ignore model-specific fields)
+
+    code
+}
+
+/// Generate OpenRouter model client construction code.
+///
+/// Emits `OpenRouterClient::new(OpenRouterConfig::new(&openrouter_api_key, "{model_id}"))` code
+/// for models classified as OpenRouter by `detect_provider()`.
+///
+/// **Validates: Requirements 10.5, 10.6**
+pub fn generate_openrouter_model(model_id: &str) -> String {
+    format!(
+        "OpenRouterClient::new(OpenRouterConfig::new(&openrouter_api_key, \"{}\"))",
+        model_id
+    )
+}
+
+/// Validate that a skills directory path is a safe relative path.
+///
+/// Returns `true` if the path is valid (relative, no parent traversal).
+/// Returns `false` if the path starts with "/" or contains "..".
+pub fn is_valid_skills_directory(path: &str) -> bool {
+    if path.is_empty() {
+        return false;
+    }
+    if path.starts_with('/') {
+        return false;
+    }
+    if path.contains("..") {
+        return false;
+    }
+    true
+}
+
+/// Generate skills configuration code for an agent.
+///
+/// - If `agent.auto_skills == Some(true)`, emits `.with_auto_skills()`
+/// - If `project.settings.skills_directory` is set AND valid (relative path, no ".."),
+///   emits `.with_skills_from_root("{path}")`
+/// - If `skills_directory` is invalid, emits a warning comment and skips the call
+/// - Returns empty string if neither condition is met
+///
+/// **Validates: Requirements 13.1, 13.2, 13.4**
+pub fn generate_skills_config(agent: &AgentSchema, project: &ProjectSchema) -> String {
+    let mut code = String::new();
+
+    if agent.auto_skills == Some(true) {
+        code.push_str("        .with_auto_skills()\n");
+    }
+
+    if let Some(ref path) = project.settings.skills_directory {
+        if is_valid_skills_directory(path) {
+            code.push_str(&format!(
+                "        .with_skills_from_root(\"{}\")\n",
+                path
+            ));
+        } else {
+            code.push_str(&format!(
+                "        // WARNING: skills_directory \"{}\" is not a valid relative path (must not start with \"/\" or contain \"..\") — skipped\n",
+                path
+            ));
+        }
+    }
+
+    code
+}
+
+fn generate_router_node(id: &str, agent: &AgentSchema, project: &ProjectSchema) -> String {
     let mut code = String::new();
     let model = agent.model.as_deref().unwrap_or("gemini-3.1-flash-lite-preview");
 
-    code.push_str(&format!("    // Router: {}\n", id));
-    code.push_str(&format!("    let {}_llm = Arc::new(\n", id));
-    code.push_str(&format!("        LlmAgentBuilder::new(\"{}\")\n", id));
+    code.push_str(&format!("    // Router: {} (LlmConditionalAgent)\n", id));
 
-    // Generate provider-specific model construction
+    // First, build each target agent as a simple LlmAgentBuilder
+    for route in &agent.routes {
+        let target_id = &route.target;
+        if let Some(target_agent) = project.agents.get(target_id) {
+            let target_model = target_agent
+                .model
+                .as_deref()
+                .unwrap_or("gemini-3.1-flash-lite-preview");
+            code.push_str(&format!(
+                "    let {}_agent = LlmAgentBuilder::new(\"{}\")\n",
+                target_id, target_id
+            ));
+
+            // Generate provider-specific model for target agent
+            let target_provider = detect_provider(target_model);
+            match target_provider {
+                "openai" => {
+                    code.push_str(&format!(
+                        "        .model(Arc::new(OpenAIClient::new(OpenAIConfig::new(&openai_api_key, \"{}\"))?))\n",
+                        target_model
+                    ));
+                }
+                "anthropic" => {
+                    code.push_str(&format!(
+                        "        .model(Arc::new(AnthropicClient::new(AnthropicConfig::new(&anthropic_api_key, \"{}\"))?))\n",
+                        target_model
+                    ));
+                }
+                "deepseek" => {
+                    let m = target_model.to_lowercase();
+                    if m.contains("reasoner") || m.contains("r1") {
+                        code.push_str(
+                            "        .model(Arc::new(DeepSeekClient::reasoner(&deepseek_api_key)?))\n",
+                        );
+                    } else {
+                        code.push_str(
+                            "        .model(Arc::new(DeepSeekClient::chat(&deepseek_api_key)?))\n",
+                        );
+                    }
+                }
+                "groq" => {
+                    code.push_str(&format!(
+                        "        .model(Arc::new(GroqClient::new(GroqConfig::new(&groq_api_key, \"{}\"))?))\n",
+                        target_model
+                    ));
+                }
+                "ollama" => {
+                    code.push_str(&format!(
+                        "        .model(Arc::new(OllamaModel::new(OllamaConfig::new(\"{}\"))?))\n",
+                        target_model
+                    ));
+                }
+                "openrouter" => {
+                    code.push_str(&format!(
+                        "        .model(Arc::new({}?))\n",
+                        generate_openrouter_model(target_model)
+                    ));
+                }
+                _ => {
+                    // Default: Gemini
+                    code.push_str(&format!(
+                        "        .model(Arc::new(GeminiModel::new(&gemini_api_key, \"{}\")?));\n",
+                        target_model
+                    ));
+                }
+            }
+
+            // Add instruction for target agent
+            if !target_agent.instruction.is_empty() {
+                let escaped = target_agent
+                    .instruction
+                    .replace('\\', "\\\\")
+                    .replace('"', "\\\"")
+                    .replace('\n', "\\n");
+                code.push_str(&format!("        .instruction(\"{}\")\n", escaped));
+            }
+
+            code.push_str("        .build()?;\n\n");
+        }
+    }
+
+    // Build the LlmConditionalAgent router
+    code.push_str(&format!(
+        "    let {}_router = LlmConditionalAgent::builder(\"{}\")\n",
+        id, id
+    ));
+
+    // Generate provider-specific model construction for the router
     let provider = detect_provider(model);
     match provider {
         "openai" => {
             code.push_str(&format!(
-                "            .model(Arc::new(OpenAIClient::new(OpenAIConfig::new(&openai_api_key, \"{}\"))?))\n",
+                "        .model(Arc::new(OpenAIClient::new(OpenAIConfig::new(&openai_api_key, \"{}\"))?))\n",
                 model
             ));
         }
         "anthropic" => {
             code.push_str(&format!(
-                "            .model(Arc::new(AnthropicClient::new(AnthropicConfig::new(&anthropic_api_key, \"{}\"))?))\n",
+                "        .model(Arc::new(AnthropicClient::new(AnthropicConfig::new(&anthropic_api_key, \"{}\"))?))\n",
                 model
             ));
         }
@@ -1386,39 +1758,46 @@ fn generate_router_node(id: &str, agent: &AgentSchema) -> String {
             let m = model.to_lowercase();
             if m.contains("reasoner") || m.contains("r1") {
                 code.push_str(
-                    "            .model(Arc::new(DeepSeekClient::reasoner(&deepseek_api_key)?))\n",
+                    "        .model(Arc::new(DeepSeekClient::reasoner(&deepseek_api_key)?))\n",
                 );
             } else {
                 code.push_str(
-                    "            .model(Arc::new(DeepSeekClient::chat(&deepseek_api_key)?))\n",
+                    "        .model(Arc::new(DeepSeekClient::chat(&deepseek_api_key)?))\n",
                 );
             }
         }
         "groq" => {
             code.push_str(&format!(
-                "            .model(Arc::new(GroqClient::new(GroqConfig::new(&groq_api_key, \"{}\"))?))\n",
+                "        .model(Arc::new(GroqClient::new(GroqConfig::new(&groq_api_key, \"{}\"))?))\n",
                 model
             ));
         }
         "ollama" => {
             code.push_str(&format!(
-                "            .model(Arc::new(OllamaModel::new(OllamaConfig::new(\"{}\"))?))\n",
+                "        .model(Arc::new(OllamaModel::new(OllamaConfig::new(\"{}\"))?))\n",
                 model
+            ));
+        }
+        "openrouter" => {
+            code.push_str(&format!(
+                "        .model(Arc::new({}?))\n",
+                generate_openrouter_model(model)
             ));
         }
         _ => {
             // Default: Gemini
             code.push_str(&format!(
-                "            .model(Arc::new(GeminiModel::new(&gemini_api_key, \"{}\")?))\n",
+                "        .model(Arc::new(GeminiModel::new(&gemini_api_key, \"{}\")?));\n",
                 model
             ));
         }
     }
 
+    // Add instruction
     let route_options: Vec<&str> = agent.routes.iter().map(|r| r.condition.as_str()).collect();
     let instruction = if agent.instruction.is_empty() {
         format!(
-            "Classify the input into one of: {}. Respond with ONLY the category name.",
+            "Route tasks to the appropriate specialist agent based on: {}",
             route_options.join(", ")
         )
     } else {
@@ -1428,12 +1807,25 @@ fn generate_router_node(id: &str, agent: &AgentSchema) -> String {
         .replace('\\', "\\\\")
         .replace('"', "\\\"")
         .replace('\n', "\\n");
-    code.push_str(&format!("            .instruction(\"{}\")\n", escaped));
-    code.push_str("            .build()?\n");
-    code.push_str("    );\n\n");
+    code.push_str(&format!("        .instruction(\"{}\")\n", escaped));
 
+    // Add .condition() for each route
+    for route in &agent.routes {
+        let condition_escaped = route
+            .condition
+            .replace('\\', "\\\\")
+            .replace('"', "\\\"");
+        code.push_str(&format!(
+            "        .condition(\"{}\", {}_agent)\n",
+            condition_escaped, route.target
+        ));
+    }
+
+    code.push_str("        .build()?;\n\n");
+
+    // Wrap in AgentNode for the graph
     code.push_str(&format!(
-        "    let {}_node = AgentNode::new({}_llm)\n",
+        "    let {}_node = AgentNode::new(Arc::new({}_router))\n",
         id, id
     ));
     code.push_str("        .with_input_mapper(|state| {\n");
@@ -1448,22 +1840,8 @@ fn generate_router_node(id: &str, agent: &AgentSchema) -> String {
     code.push_str("                if let Some(content) = event.content() {\n");
     code.push_str("                    let text: String = content.parts.iter()\n");
     code.push_str("                        .filter_map(|p| p.text())\n");
-    code.push_str("                        .collect::<Vec<_>>().join(\"\").to_lowercase();\n");
-
-    for (i, route) in agent.routes.iter().enumerate() {
-        let cond = if i == 0 { "if" } else { "else if" };
-        code.push_str(&format!(
-            "                    {} text.contains(\"{}\") {{\n",
-            cond,
-            route.condition.to_lowercase()
-        ));
-        code.push_str(&format!("                        updates.insert(\"classification\".to_string(), json!(\"{}\"));\n", route.condition));
-        code.push_str("                    }\n");
-    }
-    if let Some(first) = agent.routes.first() {
-        code.push_str(&format!("                    else {{ updates.insert(\"classification\".to_string(), json!(\"{}\")); }}\n", first.condition));
-    }
-
+    code.push_str("                        .collect::<Vec<_>>().join(\"\");\n");
+    code.push_str("                    updates.insert(\"response\".to_string(), json!(text));\n");
     code.push_str("                }\n");
     code.push_str("            }\n");
     code.push_str("            updates\n");
@@ -1644,6 +2022,12 @@ fn generate_llm_node_v2(
                 model
             ));
         }
+        "openrouter" => {
+            code.push_str(&format!(
+                "        .model(Arc::new({}?));\n",
+                generate_openrouter_model(model)
+            ));
+        }
         _ => {
             // Default: Gemini
             code.push_str(&format!(
@@ -1691,22 +2075,29 @@ fn generate_llm_node_v2(
             let tool_id = format!("{}_{}", id, tool_type);
             if let Some(ToolConfig::Function(config)) = project.tool_configs.get(&tool_id) {
                 let struct_name = to_pascal_case(&config.name);
-                code.push_str(&format!("    {}_builder = {}_builder.tool(Arc::new(FunctionTool::new(\"{}\", \"{}\", {}_fn).with_parameters_schema::<{}Args>()));\n", 
-                    id, id, config.name, config.description.replace('"', "\\\""), config.name, struct_name));
+                let confirmation = if agent.tools_requiring_confirmation.contains(tool_type) {
+                    ".with_confirmation(true)"
+                } else {
+                    ""
+                };
+                code.push_str(&format!("    {}_builder = {}_builder.tool(Arc::new(FunctionTool::new(\"{}\", \"{}\", {}_fn).with_parameters_schema::<{}Args>(){}));\n", 
+                    id, id, config.name, config.description.replace('"', "\\\""), config.name, struct_name, confirmation));
             }
         } else if !tool_type.starts_with("mcp") {
+            let needs_confirmation = agent.tools_requiring_confirmation.contains(tool_type);
+            let confirmation_suffix = if needs_confirmation { ".with_confirmation(true)" } else { "" };
             match tool_type.as_str() {
                 "google_search" => code.push_str(&format!(
-                    "    {}_builder = {}_builder.tool(Arc::new(GoogleSearchTool::new()));\n",
-                    id, id
+                    "    {}_builder = {}_builder.tool(Arc::new(GoogleSearchTool::new(){}));\n",
+                    id, id, confirmation_suffix
                 )),
                 "exit_loop" => code.push_str(&format!(
-                    "    {}_builder = {}_builder.tool(Arc::new(ExitLoopTool::new()));\n",
-                    id, id
+                    "    {}_builder = {}_builder.tool(Arc::new(ExitLoopTool::new(){}));\n",
+                    id, id, confirmation_suffix
                 )),
                 "load_artifact" => code.push_str(&format!(
-                    "    {}_builder = {}_builder.tool(Arc::new(LoadArtifactsTool::new()));\n",
-                    id, id
+                    "    {}_builder = {}_builder.tool(Arc::new(LoadArtifactsTool::new(){}));\n",
+                    id, id, confirmation_suffix
                 )),
                 "browser" => {
                     code.push_str("    for tool in browser_toolset.tools(Arc::new(MinimalContext::new())).await? {\n");
@@ -2013,6 +2404,12 @@ fn generate_container_node(id: &str, agent: &AgentSchema, project: &ProjectSchem
                         model
                     ));
                 }
+                "openrouter" => {
+                    code.push_str(&format!(
+                        "        .model(Arc::new({}?));\n",
+                        generate_openrouter_model(model)
+                    ));
+                }
                 _ => {
                     // Default: Gemini
                     code.push_str(&format!(
@@ -2043,8 +2440,13 @@ fn generate_container_node(id: &str, agent: &AgentSchema, project: &ProjectSchem
                     if let Some(ToolConfig::Function(config)) = project.tool_configs.get(&tool_id) {
                         let fn_name = &config.name;
                         let struct_name = to_pascal_case(fn_name);
-                        code.push_str(&format!("    {}_builder = {}_builder.tool(Arc::new(FunctionTool::new(\"{}\", \"{}\", {}_fn).with_parameters_schema::<{}Args>()));\n", 
-                            sub_id, sub_id, fn_name, config.description.replace('"', "\\\""), fn_name, struct_name));
+                        let confirmation = if sub.tools_requiring_confirmation.contains(tool_type) {
+                            ".with_confirmation(true)"
+                        } else {
+                            ""
+                        };
+                        code.push_str(&format!("    {}_builder = {}_builder.tool(Arc::new(FunctionTool::new(\"{}\", \"{}\", {}_fn).with_parameters_schema::<{}Args>(){}));\n", 
+                            sub_id, sub_id, fn_name, config.description.replace('"', "\\\""), fn_name, struct_name, confirmation));
                     }
                 } else if tool_type.starts_with("mcp") {
                     // Only generate tool loop if config exists (MCP setup was generated above)
@@ -2062,19 +2464,34 @@ fn generate_container_node(id: &str, agent: &AgentSchema, project: &ProjectSchem
                         code.push_str("    }\n");
                     }
                 } else if tool_type == "google_search" {
+                    let confirmation = if sub.tools_requiring_confirmation.contains(tool_type) {
+                        ".with_confirmation(true)"
+                    } else {
+                        ""
+                    };
                     code.push_str(&format!(
-                        "    {}_builder = {}_builder.tool(Arc::new(GoogleSearchTool::new()));\n",
-                        sub_id, sub_id
+                        "    {}_builder = {}_builder.tool(Arc::new(GoogleSearchTool::new(){}));\n",
+                        sub_id, sub_id, confirmation
                     ));
                 } else if tool_type == "exit_loop" {
+                    let confirmation = if sub.tools_requiring_confirmation.contains(tool_type) {
+                        ".with_confirmation(true)"
+                    } else {
+                        ""
+                    };
                     code.push_str(&format!(
-                        "    {}_builder = {}_builder.tool(Arc::new(ExitLoopTool::new()));\n",
-                        sub_id, sub_id
+                        "    {}_builder = {}_builder.tool(Arc::new(ExitLoopTool::new(){}));\n",
+                        sub_id, sub_id, confirmation
                     ));
                 } else if tool_type == "load_artifact" {
+                    let confirmation = if sub.tools_requiring_confirmation.contains(tool_type) {
+                        ".with_confirmation(true)"
+                    } else {
+                        ""
+                    };
                     code.push_str(&format!(
-                        "    {}_builder = {}_builder.tool(Arc::new(LoadArtifactsTool::new()));\n",
-                        sub_id, sub_id
+                        "    {}_builder = {}_builder.tool(Arc::new(LoadArtifactsTool::new(){}));\n",
+                        sub_id, sub_id, confirmation
                     ));
                 }
             }
@@ -4499,12 +4916,8 @@ fn generate_cargo_toml(project: &ProjectSchema) -> String {
         name = format!("project_{}", name);
     }
 
-    // Get ADK version and Rust edition from project settings (with defaults)
-    let adk_version = project
-        .settings
-        .adk_version
-        .as_deref()
-        .unwrap_or(DEFAULT_ADK_VERSION);
+    // Always use 0.8.0 — older versions are not supported by the current codegen
+    let adk_version = DEFAULT_ADK_VERSION;
     let rust_edition = project.settings.rust_edition.as_deref().unwrap_or("2024");
 
     // Check if any function tool code uses specific crates
@@ -4607,6 +5020,9 @@ fn generate_cargo_toml(project: &ProjectSchema) -> String {
     }
     if providers.contains("azure-ai") {
         model_features.push("azure-ai");
+    }
+    if providers.contains("openrouter") {
+        model_features.push("openrouter");
     }
     // Default to gemini if no providers detected
     if model_features.is_empty() {
@@ -4732,6 +5148,14 @@ uuid = {{ version = "1", features = ["v4"] }}
         if !uses_mcp {
             deps.push_str("async-trait = \"0.1\"\n");
         }
+    }
+
+    // Add adk-checkpointer-sqlite when sqlite_checkpointer is enabled
+    if project.settings.sqlite_checkpointer == Some(true) {
+        deps.push_str(&format!(
+            "adk-checkpointer-sqlite = \"{}\"\n",
+            adk_version
+        ));
     }
 
     deps

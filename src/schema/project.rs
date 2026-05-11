@@ -92,6 +92,20 @@ pub struct ProjectSettings {
     // Debug mode (v2.0) - controls visibility of StateInspector and Timeline
     #[serde(default)]
     pub debug_mode: Option<bool>,
+
+    // === Work Stream 1: Checkpointing ===
+    /// Enable SQLite checkpointing in generated graph code
+    #[serde(default)]
+    pub sqlite_checkpointer: Option<bool>,
+
+    /// Enable context compaction in generated runner
+    #[serde(default)]
+    pub context_compaction: Option<bool>,
+
+    // === Work Stream 5: Skills ===
+    /// Project-level skills directory path
+    #[serde(default)]
+    pub skills_directory: Option<String>,
 }
 
 impl Default for ProjectSettings {
@@ -111,6 +125,9 @@ impl Default for ProjectSettings {
             show_timeline: None,
             console_position: None,
             debug_mode: None,
+            sqlite_checkpointer: None,
+            context_compaction: None,
+            skills_directory: None,
         }
     }
 }
