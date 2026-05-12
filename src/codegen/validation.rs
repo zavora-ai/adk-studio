@@ -461,6 +461,7 @@ mod tests {
                 top_k: None,
                 max_output_tokens: None,
                 routes: vec![],
+            ..Default::default()
             },
         );
         project.workflow.edges = vec![Edge::new(START, "agent1"), Edge::new("agent1", END)];
@@ -552,6 +553,7 @@ mod tests {
                 top_k: None,
                 max_output_tokens: None,
                 routes: vec![],
+            ..Default::default()
             },
         );
         // agent2 is not connected to the graph
@@ -583,6 +585,7 @@ mod tests {
                 top_k: None,
                 max_output_tokens: None,
                 routes: vec![], // No routes!
+                ..Default::default()
             },
         );
         project.workflow.edges = vec![Edge::new(START, "router"), Edge::new("router", END)];
@@ -617,6 +620,7 @@ mod tests {
                     condition: "test".to_string(),
                     target: "nonexistent".to_string(), // Invalid target
                 }],
+            ..Default::default()
             },
         );
         project.workflow.edges = vec![Edge::new(START, "router"), Edge::new("router", END)];
@@ -648,6 +652,7 @@ mod tests {
                 top_k: None,
                 max_output_tokens: None,
                 routes: vec![],
+            ..Default::default()
             },
         );
         project.workflow.edges = vec![Edge::new(START, "seq"), Edge::new("seq", END)];
@@ -679,6 +684,7 @@ mod tests {
                 top_k: None,
                 max_output_tokens: None,
                 routes: vec![],
+            ..Default::default()
             },
         );
         project.workflow.edges = vec![Edge::new(START, "seq"), Edge::new("seq", END)];
@@ -993,6 +999,7 @@ mod env_var_tests {
                 top_k: None,
                 max_output_tokens: None,
                 routes: vec![],
+            ..Default::default()
             },
         );
 
@@ -1018,6 +1025,7 @@ mod env_var_tests {
                 top_k: None,
                 max_output_tokens: None,
                 routes: vec![],
+            ..Default::default()
             },
         );
 
@@ -1043,6 +1051,7 @@ mod env_var_tests {
                 top_k: None,
                 max_output_tokens: None,
                 routes: vec![],
+            ..Default::default()
             },
         );
         project.tool_configs.insert(

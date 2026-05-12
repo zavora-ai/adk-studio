@@ -58,6 +58,7 @@ fn llm_agent(instruction: &str) -> AgentSchema {
         top_k: None,
         max_output_tokens: None,
         routes: vec![],
+        ..Default::default()
     }
 }
 
@@ -123,6 +124,7 @@ fn llm_agent_with_google_search() {
 
     let code = get_main_rs(&project("test", agents));
     assert!(code.contains("GoogleSearchTool::new()"));
+    assert!(!code.contains("GoogleSearchTool::new().read_only(true)"));
 }
 
 #[test]
@@ -160,6 +162,7 @@ fn sequential_agent_generates_container() {
             top_k: None,
             max_output_tokens: None,
             routes: vec![],
+        ..Default::default()
         },
     );
 
@@ -188,6 +191,7 @@ fn sequential_agent_includes_sub_agents() {
             top_k: None,
             max_output_tokens: None,
             routes: vec![],
+        ..Default::default()
         },
     );
 
@@ -219,6 +223,7 @@ fn sequential_sub_agent_with_tools() {
             top_k: None,
             max_output_tokens: None,
             routes: vec![],
+        ..Default::default()
         },
     );
 
@@ -253,6 +258,7 @@ fn loop_agent_generates_container() {
             top_k: None,
             max_output_tokens: None,
             routes: vec![],
+        ..Default::default()
         },
     );
 
@@ -280,6 +286,7 @@ fn loop_agent_with_max_iterations() {
             top_k: None,
             max_output_tokens: None,
             routes: vec![],
+        ..Default::default()
         },
     );
 
@@ -307,6 +314,7 @@ fn loop_agent_default_iterations() {
             top_k: None,
             max_output_tokens: None,
             routes: vec![],
+        ..Default::default()
         },
     );
 
@@ -336,6 +344,7 @@ fn loop_agent_filters_exit_loop_from_output() {
             top_k: None,
             max_output_tokens: None,
             routes: vec![],
+        ..Default::default()
         },
     );
 
@@ -368,6 +377,7 @@ fn parallel_agent_generates_container() {
             top_k: None,
             max_output_tokens: None,
             routes: vec![],
+        ..Default::default()
         },
     );
 
@@ -396,6 +406,7 @@ fn parallel_agent_includes_sub_agents() {
             top_k: None,
             max_output_tokens: None,
             routes: vec![],
+        ..Default::default()
         },
     );
 
@@ -436,6 +447,7 @@ fn router_agent_generates_classifier() {
                     target: "general".to_string(),
                 },
             ],
+        ..Default::default()
         },
     );
     agents.insert("tech".to_string(), llm_agent("Handle tech."));
@@ -479,6 +491,7 @@ fn router_agent_includes_routes() {
                     target: "support_agent".to_string(),
                 },
             ],
+        ..Default::default()
         },
     );
     agents.insert("billing_agent".to_string(), llm_agent("Billing."));
@@ -768,6 +781,7 @@ fn generated_code_documents_sequential_flow() {
             top_k: None,
             max_output_tokens: None,
             routes: vec![],
+        ..Default::default()
         },
     );
 
@@ -847,6 +861,7 @@ fn template_simple_chat_generates_code() {
             top_k: None,
             max_output_tokens: None,
             routes: vec![],
+        ..Default::default()
         },
     );
 
@@ -890,6 +905,7 @@ fn template_research_pipeline_generates_code() {
             top_k: None,
             max_output_tokens: None,
             routes: vec![],
+        ..Default::default()
         },
     );
     agents.insert(
@@ -907,6 +923,7 @@ fn template_research_pipeline_generates_code() {
             top_k: None,
             max_output_tokens: None,
             routes: vec![],
+        ..Default::default()
         },
     );
     agents.insert(
@@ -924,6 +941,7 @@ fn template_research_pipeline_generates_code() {
             top_k: None,
             max_output_tokens: None,
             routes: vec![],
+        ..Default::default()
         },
     );
 
@@ -967,6 +985,7 @@ fn template_content_refiner_generates_code() {
             top_k: None,
             max_output_tokens: None,
             routes: vec![],
+        ..Default::default()
         },
     );
     agents.insert(
@@ -984,6 +1003,7 @@ fn template_content_refiner_generates_code() {
             top_k: None,
             max_output_tokens: None,
             routes: vec![],
+        ..Default::default()
         },
     );
     agents.insert(
@@ -1001,6 +1021,7 @@ fn template_content_refiner_generates_code() {
             top_k: None,
             max_output_tokens: None,
             routes: vec![],
+        ..Default::default()
         },
     );
 
@@ -1045,6 +1066,7 @@ fn template_parallel_analyzer_generates_code() {
             top_k: None,
             max_output_tokens: None,
             routes: vec![],
+        ..Default::default()
         },
     );
     agents.insert(
@@ -1062,6 +1084,7 @@ fn template_parallel_analyzer_generates_code() {
             top_k: None,
             max_output_tokens: None,
             routes: vec![],
+        ..Default::default()
         },
     );
     agents.insert(
@@ -1082,6 +1105,7 @@ fn template_parallel_analyzer_generates_code() {
             top_k: None,
             max_output_tokens: None,
             routes: vec![],
+        ..Default::default()
         },
     );
 
@@ -1137,6 +1161,7 @@ fn template_support_router_generates_code() {
                     target: "general_support".to_string(),
                 },
             ],
+        ..Default::default()
         },
     );
     agents.insert(
@@ -1154,6 +1179,7 @@ fn template_support_router_generates_code() {
             top_k: None,
             max_output_tokens: None,
             routes: vec![],
+        ..Default::default()
         },
     );
     agents.insert(
@@ -1171,6 +1197,7 @@ fn template_support_router_generates_code() {
             top_k: None,
             max_output_tokens: None,
             routes: vec![],
+        ..Default::default()
         },
     );
     agents.insert(
@@ -1188,6 +1215,7 @@ fn template_support_router_generates_code() {
             top_k: None,
             max_output_tokens: None,
             routes: vec![],
+        ..Default::default()
         },
     );
 
@@ -1238,6 +1266,7 @@ fn template_web_researcher_generates_code() {
             top_k: None,
             max_output_tokens: None,
             routes: vec![],
+        ..Default::default()
         },
     );
 
@@ -1281,6 +1310,7 @@ fn template_writing_team_generates_code() {
             top_k: None,
             max_output_tokens: None,
             routes: vec![],
+        ..Default::default()
         },
     );
     agents.insert(
@@ -1298,6 +1328,7 @@ fn template_writing_team_generates_code() {
             top_k: None,
             max_output_tokens: None,
             routes: vec![],
+        ..Default::default()
         },
     );
     agents.insert(
@@ -1315,6 +1346,7 @@ fn template_writing_team_generates_code() {
             top_k: None,
             max_output_tokens: None,
             routes: vec![],
+        ..Default::default()
         },
     );
     agents.insert(
@@ -1336,6 +1368,7 @@ fn template_writing_team_generates_code() {
             top_k: None,
             max_output_tokens: None,
             routes: vec![],
+        ..Default::default()
         },
     );
 
@@ -1381,6 +1414,7 @@ fn template_eval_loop_generates_code() {
             top_k: None,
             max_output_tokens: None,
             routes: vec![],
+        ..Default::default()
         },
     );
     agents.insert(
@@ -1398,6 +1432,7 @@ fn template_eval_loop_generates_code() {
             top_k: None,
             max_output_tokens: None,
             routes: vec![],
+        ..Default::default()
         },
     );
     agents.insert(
@@ -1415,6 +1450,7 @@ fn template_eval_loop_generates_code() {
             top_k: None,
             max_output_tokens: None,
             routes: vec![],
+        ..Default::default()
         },
     );
 
@@ -1458,6 +1494,7 @@ fn template_voice_assistant_generates_code() {
             top_k: None,
             max_output_tokens: None,
             routes: vec![],
+        ..Default::default()
         },
     );
 
@@ -1492,6 +1529,7 @@ fn template_realtime_translator_generates_code() {
             top_k: None,
             max_output_tokens: None,
             routes: vec![],
+        ..Default::default()
         },
     );
 

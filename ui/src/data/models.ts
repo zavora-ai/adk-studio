@@ -712,6 +712,14 @@ export const PROVIDERS: ProviderInfo[] = [
       },
     ],
   },
+  {
+    id: 'openrouter',
+    name: 'OpenRouter',
+    icon: '🌐',
+    envVar: 'OPENROUTER_API_KEY',
+    docsUrl: 'https://openrouter.ai/docs',
+    models: [], // Dynamic — user enters model ID
+  },
 ];
 
 // Helper functions
@@ -750,14 +758,18 @@ export function detectProviderFromModel(modelId: string): string {
     // Could be Groq or Ollama - check for Ollama-style tags
     if (lowerModel.includes(':')) return 'ollama';
     // SambaNova uses Meta-Llama prefix
-    if (modelId.startsWith('Meta-Llama')) return 'sambanova';
+    if (modelId.startsWith('Meta-Llama') || modelId.startsWith('meta-llama/')) return 'sambanova';
     // Cerebras uses plain llama-X.X-Xb format
     if (/^llama-\d/.test(lowerModel)) return 'cerebras';
     return 'groq';
   }
+  if (lowerModel.startsWith('qwen/')) return 'ollama';
   if (lowerModel.includes('qwen') || lowerModel.includes('mistral') || lowerModel.includes('codellama') || lowerModel.includes('devstral')) {
     return 'ollama';
   }
+
+  // OpenRouter: model ID contains "/" but doesn't match any known provider patterns above
+  if (modelId.includes('/')) return 'openrouter';
 
   return 'gemini'; // Default
 }

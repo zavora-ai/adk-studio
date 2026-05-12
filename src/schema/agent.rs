@@ -32,6 +32,53 @@ pub struct AgentSchema {
     /// For router agents: condition -> target agent mapping
     #[serde(default)]
     pub routes: Vec<Route>,
+
+    // === Work Stream 2: Agent Properties Extensions ===
+    /// Tool timeout in seconds (default: 300)
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub tool_timeout_secs: Option<u32>,
+
+    /// Max LLM iterations before stopping (default: 100)
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub max_llm_iterations: Option<u32>,
+
+    /// Per-tool retry budget (1-5 retries)
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub tool_retry_budget: Option<u8>,
+
+    /// Circuit breaker threshold (consecutive failures before tripping)
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub circuit_breaker_threshold: Option<u8>,
+
+    /// Tools requiring human confirmation before execution
+    #[serde(default, skip_serializing_if = "Vec::is_empty")]
+    pub tools_requiring_confirmation: Vec<String>,
+
+    /// Tool execution strategy: "sequential", "parallel", "auto"
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub tool_execution_strategy: Option<String>,
+
+    // === Work Stream 3: Model-Specific Configuration ===
+    /// Anthropic extended thinking toggle
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub extended_thinking: Option<bool>,
+
+    /// Anthropic extended thinking token budget (1024-32768)
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub thinking_budget_tokens: Option<u32>,
+
+    /// OpenAI o-series reasoning effort: "low", "medium", "high"
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub reasoning_effort: Option<String>,
+
+    /// Anthropic prompt caching toggle
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub prompt_caching: Option<bool>,
+
+    // === Work Stream 5: Skills ===
+    /// Enable auto-skills loading
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub auto_skills: Option<bool>,
 }
 
 /// A conditional route
@@ -56,6 +103,20 @@ impl AgentSchema {
             top_k: None,
             max_output_tokens: None,
             routes: Vec::new(),
+            // Work Stream 2: Agent Properties Extensions
+            tool_timeout_secs: None,
+            max_llm_iterations: None,
+            tool_retry_budget: None,
+            circuit_breaker_threshold: None,
+            tools_requiring_confirmation: Vec::new(),
+            tool_execution_strategy: None,
+            // Work Stream 3: Model-Specific Configuration
+            extended_thinking: None,
+            thinking_budget_tokens: None,
+            reasoning_effort: None,
+            prompt_caching: None,
+            // Work Stream 5: Skills
+            auto_skills: None,
         }
     }
 
@@ -87,6 +148,42 @@ pub enum AgentType {
     Router,
     Graph,
     Custom,
+}
+
+impl Default for AgentType {
+    fn default() -> Self {
+        AgentType::Llm
+    }
+}
+
+impl Default for AgentSchema {
+    fn default() -> Self {
+        Self {
+            agent_type: AgentType::default(),
+            model: None,
+            instruction: String::new(),
+            tools: Vec::new(),
+            sub_agents: Vec::new(),
+            position: Position::default(),
+            max_iterations: None,
+            temperature: None,
+            top_p: None,
+            top_k: None,
+            max_output_tokens: None,
+            routes: Vec::new(),
+            tool_timeout_secs: None,
+            max_llm_iterations: None,
+            tool_retry_budget: None,
+            circuit_breaker_threshold: None,
+            tools_requiring_confirmation: Vec::new(),
+            tool_execution_strategy: None,
+            extended_thinking: None,
+            thinking_budget_tokens: None,
+            reasoning_effort: None,
+            prompt_caching: None,
+            auto_skills: None,
+        }
+    }
 }
 
 /// Canvas position

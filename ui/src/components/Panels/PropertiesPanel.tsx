@@ -2,6 +2,7 @@ import React from 'react';
 import type { AgentSchema, ToolConfig } from '../../types/project';
 import { TOOL_TYPES } from './ToolPalette';
 import { ModelSelector } from './ModelSelector';
+import { ResilienceSection } from './ResilienceSection';
 
 interface Props {
   nodeId: string;
@@ -278,6 +279,14 @@ function LlmProperties({ nodeId, agent, toolConfigs, onUpdate, onSelectTool, onR
           <ModelSelector
             value={agent.model || ''}
             onChange={(model) => onUpdate(nodeId, { model })}
+            extendedThinking={agent.extended_thinking}
+            onExtendedThinkingChange={(val) => onUpdate(nodeId, { extended_thinking: val })}
+            thinkingBudgetTokens={agent.thinking_budget_tokens}
+            onThinkingBudgetChange={(val) => onUpdate(nodeId, { thinking_budget_tokens: val })}
+            promptCaching={agent.prompt_caching}
+            onPromptCachingChange={(val) => onUpdate(nodeId, { prompt_caching: val })}
+            reasoningEffort={agent.reasoning_effort}
+            onReasoningEffortChange={(val) => onUpdate(nodeId, { reasoning_effort: val })}
           />
         </Field>
         <Field label="Instruction">
@@ -325,6 +334,9 @@ function LlmProperties({ nodeId, agent, toolConfigs, onUpdate, onSelectTool, onR
           </div>
         </Section>
       )}
+
+      {/* Resilience & Execution (collapsible) */}
+      <ResilienceSection nodeId={nodeId} agent={agent} onUpdate={onUpdate} />
 
       {/* Advanced Settings (collapsible) */}
       <div>

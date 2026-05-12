@@ -39,6 +39,8 @@ export interface DeployRequest {
   deploymentEnvironment?: string;
   openDeploymentConsole?: boolean;
   workspaceId?: string;
+  /** Deployment target: local (run on machine), docker (container), cloud (remote platform) */
+  deployTarget?: 'local' | 'docker' | 'cloud';
 }
 
 export interface SpatialRegistrationResult {

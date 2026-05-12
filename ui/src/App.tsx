@@ -4,7 +4,8 @@ import { useStore } from './store';
 import { ProjectList } from './components/Projects/ProjectList';
 import { Canvas } from './components/Canvas/Canvas';
 import { ThemeProvider, ThemeToggle } from './components/Theme';
-import { WalkthroughModal, SettingsModal, TemplateWalkthroughModal } from './components/Overlays';
+import { WalkthroughModal, SettingsModal, TemplateWalkthroughModal, DeployModal } from './components/Overlays';
+import type { DeployStep, DeployTarget } from './components/Overlays';
 import { useWalkthrough } from './hooks/useWalkthrough';
 import { useTheme } from './hooks/useTheme';
 import { useVSCodeThemeSync } from './hooks/useVSCodeThemeSync';
@@ -36,7 +37,12 @@ export default function App() {
   const { currentProject, fetchProjects, openProject } = useStore();
   const [showGlobalSettings, setShowGlobalSettings] = useState(false);
   const [deploying, setDeploying] = useState(false);
-  const [deployMessage, setDeployMessage] = useState<string | null>(null);
+  const [showDeployModal, setShowDeployModal] = useState(false);
+  const [deploySuccess, setDeploySuccess] = useState<boolean | null>(null);
+  const [deploySteps, setDeploySteps] = useState<DeployStep[]>([]);
+  const [deployError, setDeployError] = useState<string | undefined>();
+  const [deployUrl, setDeployUrl] = useState<string | undefined>();
+  const [deployManifestPath, setDeployManifestPath] = useState<string | undefined>();
 
   // Listen for live VS Code theme changes via postMessage
   useVSCodeThemeSync();
@@ -70,39 +76,101 @@ export default function App() {
     }
   }, [shouldShowOnFirstRun, openWalkthrough]);
 
-  const handleDeploy = useCallback(async () => {
+  const handleDeploy = useCallback(async (target: DeployTarget, cloudUrl?: string) => {
     if (!currentProject || deploying) return;
     setDeploying(true);
-    setDeployMessage(null);
+    setDeploySuccess(null);
+    setDeployError(undefined);
+    setDeployUrl(undefined);
+    setDeployManifestPath(undefined);
+
+    const targetSteps: Record<DeployTarget, DeployStep[]> = {
+      local: [
+        { label: 'Generating deployment manifest & code', status: 'running' },
+        { label: 'Building agent binary (cargo build --release)', status: 'pending' },
+        { label: 'Starting local ADK platform', status: 'pending' },
+        { label: 'Pushing deployment to platform', status: 'pending' },
+      ],
+      docker: [
+        { label: 'Generating deployment manifest & code', status: 'running' },
+        { label: 'Generating Dockerfile & docker-compose.yml', status: 'pending' },
+        { label: 'Building Docker image', status: 'pending' },
+        { label: 'Starting containers', status: 'pending' },
+      ],
+      cloud: [
+        { label: 'Generating deployment manifest & code', status: 'running' },
+        { label: 'Authenticating with platform', status: 'pending' },
+        { label: 'Uploading secrets', status: 'pending' },
+        { label: 'Pushing deployment bundle', status: 'pending' },
+      ],
+    };
+
+    const steps = targetSteps[target];
+    setDeploySteps([...steps]);
+
     try {
+      // All targets start with manifest + codegen (step 0)
       const result = await api.projects.deploy(currentProject.id, {
         register: false,
         openSpatialOs: false,
-        pushToDeploymentPlatform: true,
-        openDeploymentConsole: true,
-        deploymentEnvironment: 'staging',
+        pushToDeploymentPlatform: target !== 'docker', // docker doesn't push to platform
+        openDeploymentConsole: target === 'cloud',
+        deploymentEnvironment: target === 'local' ? 'local' : target === 'docker' ? 'docker' : 'staging',
+        controlPlaneUrl: cloudUrl || undefined,
+        deployTarget: target,
       });
+
+      // Mark all steps done on success
+      steps.forEach(s => { s.status = 'done'; });
+      setDeploySteps([...steps]);
+
+      setDeploySuccess(true);
+      setDeployManifestPath(result.deploymentManifestPath ?? result.manifestPath);
+
       if (result.openUrl) {
-        window.open(result.openUrl, '_blank', 'noopener,noreferrer');
+        setDeployUrl(result.openUrl);
       }
       if (result.deployment) {
-        setDeployMessage(
-          `Deployed ${result.deployment.agentName} ${result.deployment.version} to ${result.deployment.environment}. Manifest: ${result.deploymentManifestPath ?? result.manifestPath}`
-        );
-      } else if (result.registration.success) {
-        setDeployMessage(`Manifest created. Spatial OS registration complete: ${result.manifestPath}`);
+        steps[steps.length - 1].detail = `${result.deployment.agentName} v${result.deployment.version} → ${result.deployment.environment}`;
+        setDeploySteps([...steps]);
       } else {
-        setDeployMessage(
-          `Manifest created. Deployment push skipped. Spatial OS registration: ${result.registration.message}`
-        );
+        // For local/docker where platform push may be skipped
+        steps[steps.length - 1].detail = target === 'docker'
+          ? 'Image built. Run: docker compose up'
+          : target === 'local'
+          ? 'Agent deployed to local platform'
+          : 'Manifest generated';
+        setDeploySteps([...steps]);
       }
     } catch (error) {
       const message = error instanceof Error ? error.message : 'Unknown error';
-      setDeployMessage(`Deploy failed: ${message}`);
+      setDeployError(message);
+      setDeploySuccess(false);
+      // Mark the first pending/running step as error
+      const runningIdx = steps.findIndex(s => s.status === 'running' || s.status === 'pending');
+      if (runningIdx >= 0) {
+        // Mark preceding pending steps as done (they completed server-side)
+        for (let i = 0; i < runningIdx; i++) {
+          if (steps[i].status === 'running') steps[i].status = 'done';
+        }
+        steps[runningIdx].status = 'error';
+        steps[runningIdx].detail = message;
+        setDeploySteps([...steps]);
+      } else {
+        // All were running/pending, mark first as error
+        steps[0].status = 'error';
+        steps[0].detail = message;
+        setDeploySteps([...steps]);
+      }
     } finally {
       setDeploying(false);
     }
   }, [currentProject, deploying]);
+
+  const handleOpenDeployModal = useCallback(() => {
+    if (!currentProject) return;
+    setShowDeployModal(true);
+  }, [currentProject]);
 
   return (
     <ThemeProvider>
@@ -127,7 +195,7 @@ export default function App() {
           </div>
           <div className="flex items-center gap-2">
             <button
-              onClick={handleDeploy}
+              onClick={handleOpenDeployModal}
               disabled={!currentProject || deploying}
               className="px-3 py-1.5 rounded text-xs font-semibold border transition-opacity disabled:opacity-50"
               style={{
@@ -151,18 +219,6 @@ export default function App() {
           </div>
         </header>
         <main className="flex-1 overflow-hidden" style={{ backgroundColor: 'var(--bg-canvas)' }}>
-          {deployMessage && (
-            <div
-              className="px-4 py-2 text-xs border-b"
-              style={{
-                backgroundColor: 'var(--surface-panel)',
-                borderColor: 'var(--border-default)',
-                color: 'var(--text-secondary)',
-              }}
-            >
-              {deployMessage}
-            </div>
-          )}
           {currentProject ? (
             <ReactFlowProvider>
               <Canvas />
@@ -194,6 +250,21 @@ export default function App() {
               updateProjectSettings(settings);
             } : undefined}
             onClose={() => setShowGlobalSettings(false)}
+          />
+        )}
+
+        {/* Deploy Modal */}
+        {showDeployModal && (
+          <DeployModal
+            projectName={currentProject?.name ?? 'Project'}
+            deploying={deploying}
+            success={deploySuccess}
+            steps={deploySteps}
+            errorMessage={deployError}
+            deploymentUrl={deployUrl}
+            manifestPath={deployManifestPath}
+            onDeploy={handleDeploy}
+            onClose={() => setShowDeployModal(false)}
           />
         )}
         

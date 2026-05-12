@@ -82,6 +82,7 @@ fn simple_chat_project() -> ProjectSchema {
             top_k: None,
             max_output_tokens: None,
             routes: vec![],
+        ..Default::default()
         },
     );
     p.workflow.edges.push(Edge::new("START", "chat_agent"));
@@ -109,6 +110,7 @@ fn research_pipeline_project() -> ProjectSchema {
             top_k: None,
             max_output_tokens: None,
             routes: vec![],
+        ..Default::default()
         },
     );
     p.agents.insert(
@@ -126,6 +128,7 @@ fn research_pipeline_project() -> ProjectSchema {
             top_k: None,
             max_output_tokens: None,
             routes: vec![],
+        ..Default::default()
         },
     );
 
@@ -144,6 +147,7 @@ fn research_pipeline_project() -> ProjectSchema {
             top_k: None,
             max_output_tokens: None,
             routes: vec![],
+        ..Default::default()
         },
     );
 
@@ -171,6 +175,7 @@ fn content_refiner_project() -> ProjectSchema {
             top_k: None,
             max_output_tokens: None,
             routes: vec![],
+        ..Default::default()
         },
     );
     p.agents.insert(
@@ -190,6 +195,7 @@ fn content_refiner_project() -> ProjectSchema {
             top_k: None,
             max_output_tokens: None,
             routes: vec![],
+        ..Default::default()
         },
     );
 
@@ -208,6 +214,7 @@ fn content_refiner_project() -> ProjectSchema {
             top_k: None,
             max_output_tokens: None,
             routes: vec![],
+        ..Default::default()
         },
     );
 
@@ -235,6 +242,7 @@ fn parallel_analyzer_project() -> ProjectSchema {
             top_k: None,
             max_output_tokens: None,
             routes: vec![],
+        ..Default::default()
         },
     );
     p.agents.insert(
@@ -252,6 +260,7 @@ fn parallel_analyzer_project() -> ProjectSchema {
             top_k: None,
             max_output_tokens: None,
             routes: vec![],
+        ..Default::default()
         },
     );
 
@@ -270,6 +279,7 @@ fn parallel_analyzer_project() -> ProjectSchema {
             top_k: None,
             max_output_tokens: None,
             routes: vec![],
+        ..Default::default()
         },
     );
 
@@ -309,6 +319,7 @@ fn support_router_project() -> ProjectSchema {
                     target: "general_agent".to_string(),
                 },
             ],
+        ..Default::default()
         },
     );
 
@@ -327,6 +338,7 @@ fn support_router_project() -> ProjectSchema {
             top_k: None,
             max_output_tokens: None,
             routes: vec![],
+        ..Default::default()
         },
     );
     p.agents.insert(
@@ -345,6 +357,7 @@ fn support_router_project() -> ProjectSchema {
             top_k: None,
             max_output_tokens: None,
             routes: vec![],
+        ..Default::default()
         },
     );
     p.agents.insert(
@@ -362,6 +375,7 @@ fn support_router_project() -> ProjectSchema {
             top_k: None,
             max_output_tokens: None,
             routes: vec![],
+        ..Default::default()
         },
     );
 

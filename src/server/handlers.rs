@@ -211,6 +211,9 @@ pub struct DeployRequest {
     pub open_deployment_console: Option<bool>,
     #[serde(default)]
     pub workspace_id: Option<String>,
+    /// Deployment target: "local", "docker", or "cloud"
+    #[serde(default)]
+    pub deploy_target: Option<String>,
 }
 
 #[derive(Debug, Serialize)]
@@ -329,6 +332,8 @@ pub async fn deploy_project(
     let base_dir = storage.base_dir().to_path_buf();
     drop(storage);
 
+    let deploy_target = req.deploy_target.as_deref().unwrap_or("cloud");
+
     let manifest = DeployManifest::from_project(&project);
     let deploy_dir = base_dir.join("deploy").join(id.to_string());
     let runtime_dir = deploy_dir.join("runtime");
@@ -363,11 +368,24 @@ pub async fn deploy_project(
         .await
         .map_err(|e| err(StatusCode::INTERNAL_SERVER_ERROR, e.to_string()))?;
 
+    // Generate Dockerfile and docker-compose.yml for docker target
+    if deploy_target == "docker" {
+        let binary_name = project_binary_name(&project);
+        let dockerfile = generate_dockerfile(&binary_name);
+        let compose = generate_docker_compose(&binary_name, &project_keys);
+        tokio::fs::write(runtime_dir.join("Dockerfile"), &dockerfile)
+            .await
+            .map_err(|e| err(StatusCode::INTERNAL_SERVER_ERROR, e.to_string()))?;
+        tokio::fs::write(runtime_dir.join("docker-compose.yml"), &compose)
+            .await
+            .map_err(|e| err(StatusCode::INTERNAL_SERVER_ERROR, e.to_string()))?;
+    }
+
     let spatial_os_url = normalize_spatial_os_url(req.spatial_os_url);
     let control_plane_url = normalize_control_plane_url(req.control_plane_url.clone());
     let deployment_console_url = normalize_deployment_console_url(None);
-    let should_register = req.register.unwrap_or(true);
-    let should_push = req.push_to_deployment_platform.unwrap_or(true);
+    let should_register = req.register.unwrap_or(false);
+    let should_push = req.push_to_deployment_platform.unwrap_or(deploy_target != "docker");
     let deployment_environment = req
         .deployment_environment
         .clone()
@@ -435,7 +453,7 @@ pub async fn deploy_project(
         None
     };
 
-    let open_url = if req.open_deployment_console.unwrap_or(true) && deployment.is_some() {
+    let open_url = if req.open_deployment_console.unwrap_or(false) && deployment.is_some() {
         Some(deployment_console_url.clone())
     } else if req.open_spatial_os.unwrap_or(false) {
         Some(spatial_os_url.clone())
@@ -643,6 +661,55 @@ fn project_binary_name(project: &ProjectSchema) -> String {
         project_name = format!("project_{project_name}");
     }
     project_name
+}
+
+fn generate_dockerfile(binary_name: &str) -> String {
+    format!(
+        r#"# Multi-stage build for ADK agent
+FROM rust:1.94-slim AS builder
+WORKDIR /app
+COPY . .
+RUN cargo build --release
+
+FROM debian:bookworm-slim
+RUN apt-get update && apt-get install -y ca-certificates && rm -rf /var/lib/apt/lists/*
+COPY --from=builder /app/target/release/{binary_name} /usr/local/bin/agent
+COPY adk-deploy.toml /app/adk-deploy.toml
+WORKDIR /app
+EXPOSE 8080
+ENV RUST_LOG=info
+CMD ["agent"]
+"#
+    )
+}
+
+fn generate_docker_compose(binary_name: &str, env_vars: &HashMap<String, String>) -> String {
+    let env_lines: String = env_vars
+        .iter()
+        .map(|(k, _)| format!("      {k}: ${{{k}}}", k = k))
+        .collect::<Vec<_>>()
+        .join("\n");
+
+    let env_section = if env_lines.is_empty() {
+        String::new()
+    } else {
+        format!("    environment:\n{env_lines}\n")
+    };
+
+    format!(
+        r#"# ADK Agent Deployment
+# Run: docker compose up -d
+services:
+  agent:
+    build: .
+    container_name: {binary_name}
+    ports:
+      - "8080:8080"
+    restart: unless-stopped
+{env_section}    env_file:
+      - .env
+"#
+    )
 }
 
 /// Build response
