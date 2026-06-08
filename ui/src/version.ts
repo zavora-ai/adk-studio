@@ -1,1 +1,1 @@
-export const ADK_VERSION = '0.8.0';
+export const ADK_VERSION = '1.0.0';

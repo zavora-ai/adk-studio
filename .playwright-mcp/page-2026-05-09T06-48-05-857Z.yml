@@ -1,0 +1,253 @@
+- generic [ref=e3]:
+  - banner [ref=e4]:
+    - generic [ref=e5]:
+      - heading "ADK ADK Studio v0.8.0" [level=1] [ref=e6]:
+        - img "ADK" [ref=e7]
+        - text: ADK Studio
+        - generic [ref=e8]: v0.8.0
+      - generic [ref=e1129]: / dxcs
+    - generic [ref=e9]:
+      - button "Deploy" [ref=e10] [cursor=pointer]
+      - button "⚙️" [ref=e11] [cursor=pointer]
+      - button "Switch to light mode" [ref=e12] [cursor=pointer]:
+        - img [ref=e13]
+  - main [ref=e19]:
+    - generic [ref=e1130]:
+      - generic [ref=e1131]:
+        - generic [ref=e1132]:
+          - img "ADK" [ref=e1133]
+          - text: ADK Studio
+        - button "File" [ref=e1340] [cursor=pointer]
+        - button "Templates" [ref=e1342] [cursor=pointer]
+        - button "Help" [ref=e1344] [cursor=pointer]
+        - generic [ref=e1140]:
+          - generic [ref=e1141]: "Project: dxcs"
+          - button "○ Not Built" [ref=e1142]:
+            - generic [ref=e1143]: ○
+            - generic [ref=e1144]: Not Built
+          - button "🐛 Debug" [ref=e1145] [cursor=pointer]:
+            - generic [ref=e1146]: 🐛
+            - generic [ref=e1147]: Debug
+      - generic [ref=e1148]:
+        - generic [ref=e1149]:
+          - generic [ref=e1150]:
+            - heading "Agents" [level=3] [ref=e1151]
+            - generic [ref=e1152]:
+              - generic [ref=e1153]: ⊕ LLM Agent
+              - generic [ref=e1154]: ⊕ Sequential Agent
+              - generic [ref=e1155]: ⊕ Loop Agent
+              - generic [ref=e1156]: ⊕ Parallel Agent
+              - generic [ref=e1157]: ⊕ Router Agent
+          - generic [ref=e1158]:
+            - heading "Actions" [level=3] [ref=e1159]
+            - generic [ref=e1160]:
+              - generic [ref=e1161]: Entry
+              - generic "Drag or click to add Trigger node" [ref=e1163]: 🎯 Trigger
+            - generic [ref=e1164]:
+              - generic [ref=e1165]: Data
+              - generic [ref=e1166]:
+                - generic "Drag or click to add Set node" [ref=e1167]: 📝 Set
+                - generic "Drag or click to add Transform node" [ref=e1168]: ⚙️ Transform
+            - generic [ref=e1169]:
+              - generic [ref=e1170]: Control
+              - generic [ref=e1171]:
+                - generic "Drag or click to add Switch node" [ref=e1172]: 🔀 Switch
+                - generic "Drag or click to add Loop node" [ref=e1173]: 🔄 Loop
+                - generic "Drag or click to add Merge node" [ref=e1174]: 🔗 Merge
+                - generic "Drag or click to add Wait node" [ref=e1175]: ⏱️ Wait
+            - generic [ref=e1176]:
+              - generic [ref=e1177]: Integration
+              - generic [ref=e1178]:
+                - generic "Drag or click to add HTTP node" [ref=e1179]: 🌐 HTTP
+                - generic "Drag or click to add Database node" [ref=e1180]: 🗄️ Database
+                - generic "Drag or click to add Email node" [ref=e1181]: 📧 Email
+            - generic [ref=e1182]:
+              - generic [ref=e1183]: Code
+              - generic "Drag or click to add Code node" [ref=e1185]: 💻 Code
+          - generic [ref=e1186]:
+            - heading "Tools" [level=3] [ref=e1187]
+            - generic [ref=e1188]:
+              - generic [ref=e1189]:
+                - generic [ref=e1190]: ƒ
+                - generic [ref=e1191]: Function Tool
+              - generic [ref=e1192]:
+                - generic [ref=e1193]: 🔌
+                - generic [ref=e1194]: MCP Tool
+              - generic [ref=e1195]:
+                - generic [ref=e1196]: 🌐
+                - generic [ref=e1197]: Browser Tool
+              - generic [ref=e1198]:
+                - generic [ref=e1199]: ⏹
+                - generic [ref=e1200]: Exit Loop
+              - generic [ref=e1201]:
+                - generic [ref=e1202]: 🔍
+                - generic [ref=e1203]: Google Search
+              - generic [ref=e1204]:
+                - generic [ref=e1205]: 📦
+                - generic [ref=e1206]: Load Artifact
+          - generic [ref=e1207]:
+            - button "📄 View Code" [ref=e1208] [cursor=pointer]
+            - generic [ref=e1209]:
+              - button "🔨 Build Required" [ref=e1210] [cursor=pointer]
+              - button "⚡" [ref=e1211] [cursor=pointer]
+            - button "Hide Console" [ref=e1212] [cursor=pointer]
+            - button "⚙️ Settings" [ref=e1213] [cursor=pointer]
+            - button "Back" [ref=e1214] [cursor=pointer]
+        - generic [ref=e1215]:
+          - application [ref=e1216]:
+            - generic [ref=e1218] [cursor=pointer]:
+              - generic:
+                - generic:
+                  - img:
+                    - group "Edge from manual_trigger to START" [ref=e1219]
+                  - img:
+                    - group "Edge from START to chat_agent" [ref=e1222]
+                  - img:
+                    - group "Edge from chat_agent to END" [ref=e1225]
+                - generic:
+                  - group [ref=e1228]:
+                    - generic [ref=e1229]:
+                      - generic [ref=e1230]:
+                        - generic [ref=e1231]: 🎯
+                        - generic [ref=e1232]: Manual Trigger
+                        - generic [ref=e1233]: trigger
+                      - generic [ref=e1234]:
+                        - generic [ref=e1235]:
+                          - generic [ref=e1236]: 👆
+                          - generic [ref=e1237]: Manual
+                        - generic [ref=e1238]: Click to run
+                  - group [ref=e1240]:
+                    - generic [ref=e1244]:
+                      - generic [ref=e1245]: ▶
+                      - generic [ref=e1246]: START
+                  - group [ref=e1249]:
+                    - generic [ref=e1251]:
+                      - generic [ref=e1252]: ⏹
+                      - generic [ref=e1253]: END
+                  - group [ref=e1256]:
+                    - generic [ref=e1257]:
+                      - generic [ref=e1260]:
+                        - generic [ref=e1261]: 🤖
+                        - generic [ref=e1262]: chat_agent
+                        - generic [ref=e1263]: agent
+                      - generic [ref=e1264]:
+                        - generic [ref=e1265]:
+                          - generic [ref=e1266]: 🧠
+                          - generic [ref=e1267]: gemini-3.1-flash-lite-preview
+                        - generic "google_search" [ref=e1270]:
+                          - generic [ref=e1271]: 🔍
+                          - generic [ref=e1272]: google_sear…
+            - img
+            - generic "Control Panel" [ref=e1275]:
+              - button "Zoom In" [ref=e1276] [cursor=pointer]:
+                - img [ref=e1277]
+              - button "Zoom Out" [ref=e1279] [cursor=pointer]:
+                - img [ref=e1280]
+              - button "Fit View" [ref=e1282] [cursor=pointer]:
+                - img [ref=e1283]
+              - button "Toggle Interactivity" [ref=e1285] [cursor=pointer]:
+                - img [ref=e1286]
+            - img "Mini Map" [ref=e1289]
+          - generic [ref=e1295]:
+            - button "✋ Free" [ref=e1296] [cursor=pointer]:
+              - generic [ref=e1297]: ✋
+              - text: Free
+            - button "↔ LR" [ref=e1298] [cursor=pointer]:
+              - generic [ref=e1299]: ↔
+              - text: LR
+            - button "⤢ Arrange" [ref=e1300] [cursor=pointer]:
+              - generic [ref=e1301]: ⤢
+              - text: Arrange
+            - button "⊞ Snap" [ref=e1302] [cursor=pointer]:
+              - generic [ref=e1303]: ⊞
+              - text: Snap
+            - combobox "Grid size in pixels" [ref=e1304]:
+              - option "10px"
+              - option "20px" [selected]
+              - option "40px"
+            - button "🔀 Flow Off" [ref=e1305] [cursor=pointer]:
+              - generic [ref=e1306]: 🔀
+              - text: Flow Off
+            - button "⊡ Fit" [ref=e1307] [cursor=pointer]:
+              - generic [ref=e1308]: ⊡
+              - text: Fit
+            - button "🗺️ Map" [ref=e1309] [cursor=pointer]:
+              - generic [ref=e1310]: 🗺️
+              - text: Map
+            - generic "Current zoom level (Ctrl+Plus/Minus to zoom)" [ref=e1311]:
+              - generic [ref=e1312]: 🔍
+              - text: 90%
+            - button "▶️ Run" [disabled] [ref=e1315]:
+              - generic [ref=e1316]: ▶️
+              - text: Run
+      - generic [ref=e1318]:
+        - generic [ref=e1319]:
+          - generic [ref=e1320]:
+            - button "💬 Chat" [ref=e1321] [cursor=pointer]
+            - button "📋 Events" [ref=e1322] [cursor=pointer]
+            - generic [ref=e1323]: ⚪
+            - generic [ref=e1324]: ⚪
+          - generic [ref=e1325]:
+            - button "🗑️ Clear" [ref=e1326] [cursor=pointer]
+            - button "➕ New" [ref=e1327] [cursor=pointer]
+            - button "▼" [ref=e1328] [cursor=pointer]
+        - generic [ref=e1331]:
+          - paragraph [ref=e1332]: 🎉 Workflow ready!
+          - paragraph [ref=e1333]:
+            - text: Click
+            - strong [ref=e1334]: Build
+            - text: to compile your workflow, then you can start chatting.
+        - generic [ref=e1336]:
+          - textbox "⚙️ Click Build to compile your workflow" [disabled] [ref=e1337]
+          - button "🔨 Build" [ref=e1338] [cursor=pointer]
+  - generic [ref=e1346]:
+    - generic [ref=e1347]:
+      - heading "⚙️ Settings" [level=2] [ref=e1348]
+      - button "×" [ref=e1349] [cursor=pointer]
+    - generic [ref=e1350]:
+      - button "📁 Project" [ref=e1351] [cursor=pointer]
+      - button "🌐 Global Defaults" [ref=e1352] [cursor=pointer]
+    - generic [ref=e1353]:
+      - button "📋 General" [ref=e1354] [cursor=pointer]
+      - button "⚙️ Code Gen" [ref=e1355] [cursor=pointer]
+      - button "🎨 UI" [ref=e1356] [cursor=pointer]
+      - button "🔐 Environment" [ref=e1357] [cursor=pointer]
+      - button "🚀 Production" [ref=e1358] [cursor=pointer]
+    - generic [ref=e1360]:
+      - generic [ref=e1361]:
+        - generic [ref=e1362]: Project Name
+        - textbox [ref=e1363]: dxcs
+      - generic [ref=e1364]:
+        - generic [ref=e1365]: Description
+        - textbox [ref=e1366]
+      - generic [ref=e1367]:
+        - generic [ref=e1368]: Default Provider
+        - combobox [ref=e1369]:
+          - option "✨ Google Gemini" [selected]
+          - option "🤖 OpenAI"
+          - option "🎭 Anthropic Claude"
+          - option "🔍 DeepSeek"
+          - option "⚡ Groq"
+          - option "🦙 Ollama (Local)"
+          - option "🎆 Fireworks AI"
+          - option "🤝 Together AI"
+          - option "🌬️ Mistral AI"
+          - option "🔮 Perplexity"
+          - option "🧪 Cerebras"
+          - option "⚙️ SambaNova"
+          - option "🪨 Amazon Bedrock"
+          - option "☁️ Azure AI"
+          - option "𝕏 xAI"
+          - option "🌐 OpenRouter"
+      - generic [ref=e1370]:
+        - generic [ref=e1371]: Default Model
+        - combobox [ref=e1372]:
+          - option "Gemini 3.1 Pro"
+          - option "Gemini 3.1 Flash Lite" [selected]
+          - option "Gemini 3 Flash"
+          - option "Gemini 2.5 Pro"
+          - option "Gemini 2.5 Flash"
+          - option "Gemini 2.5 Flash Lite"
+    - generic [ref=e1373]:
+      - button "Cancel" [ref=e1374] [cursor=pointer]
+      - button "Save Settings" [ref=e1375] [cursor=pointer]

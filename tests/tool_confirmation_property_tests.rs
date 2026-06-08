@@ -237,7 +237,7 @@ proptest! {
     ) {
         let code = get_main_rs(&project);
 
-        // In ADK 0.8.0, GoogleSearchTool and LoadArtifactsTool are inherently read-only
+        // In ADK 0.8.2, GoogleSearchTool and LoadArtifactsTool are inherently read-only
         // via their trait implementation, so .read_only(true) is no longer emitted.
         // Just verify that .with_confirmation(true) is present for confirmed tools.
         for tool in &confirmation_tools {
@@ -256,7 +256,7 @@ proptest! {
                     // Verify .read_only(true) is NOT present
                     prop_assert!(
                         !tool_line.contains(".read_only(true)"),
-                        "Tool '{}' should NOT have .read_only(true) in ADK 0.8.0. Line: '{}'",
+                        "Tool '{}' should NOT have .read_only(true) in ADK 0.8.2. Line: '{}'",
                         tool, tool_line
                     );
                 }

@@ -6,7 +6,7 @@
 //! For any valid ProjectSchema, the generated Cargo.toml SHALL:
 //! (a) include `adk-checkpointer-sqlite` only when `sqlite_checkpointer` is enabled,
 //! (b) include only feature flags for providers actually used in the project,
-//! (c) target version "0.8.0" for all adk crate dependencies.
+//! (c) target version "1.0.0" for all adk crate dependencies.
 
 use adk_studio::codegen::{detect_provider, generate_rust_project};
 use adk_studio::schema::{AgentSchema, AgentType, Edge, ProjectSchema};
@@ -208,8 +208,8 @@ proptest! {
             "Cargo.toml must contain adk-checkpointer-sqlite when sqlite_checkpointer is enabled"
         );
         prop_assert!(
-            cargo_toml.contains("adk-checkpointer-sqlite = \"0.8.0\""),
-            "adk-checkpointer-sqlite must be version 0.8.0"
+            cargo_toml.contains("adk-checkpointer-sqlite = \"1.0.0\""),
+            "adk-checkpointer-sqlite must be version 1.0.0"
         );
     }
 
@@ -303,9 +303,9 @@ proptest! {
 
     /// **Validates: Requirements 15.4**
     ///
-    /// Property 13(c): All adk crate dependencies target version "0.8.0".
+    /// Property 13(c): All adk crate dependencies target version "1.0.0".
     #[test]
-    fn all_adk_crates_at_version_0_8_0(
+    fn all_adk_crates_at_version_1_0_0(
         project in arb_project_schema()
     ) {
         let cargo_toml = get_cargo_toml(&project);
@@ -318,16 +318,16 @@ proptest! {
                 // Simple version format: adk-foo = "X.Y.Z"
                 if trimmed.contains("= \"") && !trimmed.contains('{') {
                     prop_assert!(
-                        trimmed.contains("\"0.8.0\""),
-                        "ADK crate dependency should be version 0.8.0: {}",
+                        trimmed.contains("\"1.0.0\""),
+                        "ADK crate dependency should be version 1.0.0: {}",
                         trimmed
                     );
                 }
                 // Complex version format: adk-foo = { version = "X.Y.Z", ... }
                 if trimmed.contains("version = \"") {
                     prop_assert!(
-                        trimmed.contains("version = \"0.8.0\""),
-                        "ADK crate dependency should have version 0.8.0: {}",
+                        trimmed.contains("version = \"1.0.0\""),
+                        "ADK crate dependency should have version 1.0.0: {}",
                         trimmed
                     );
                 }
@@ -378,21 +378,21 @@ proptest! {
             );
         }
 
-        // (c) All adk crates at version 0.8.0
+        // (c) All adk crates at version 1.0.0
         for line in cargo_toml.lines() {
             let trimmed = line.trim();
             if trimmed.starts_with("adk-") {
                 if trimmed.contains("= \"") && !trimmed.contains('{') {
                     prop_assert!(
-                        trimmed.contains("\"0.8.0\""),
-                        "ADK crate not at 0.8.0: {}",
+                        trimmed.contains("\"1.0.0\""),
+                        "ADK crate not at 1.0.0: {}",
                         trimmed
                     );
                 }
                 if trimmed.contains("version = \"") {
                     prop_assert!(
-                        trimmed.contains("version = \"0.8.0\""),
-                        "ADK crate not at 0.8.0: {}",
+                        trimmed.contains("version = \"1.0.0\""),
+                        "ADK crate not at 1.0.0: {}",
                         trimmed
                     );
                 }

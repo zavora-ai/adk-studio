@@ -34,7 +34,7 @@ pub use validation::{
 use crate::schema::{AgentSchema, AgentType, ProjectSchema, ToolConfig};
 use anyhow::{Result, bail};
 
-const DEFAULT_ADK_VERSION: &str = "0.8.0";
+const DEFAULT_ADK_VERSION: &str = "1.0.0";
 
 /// Detect the LLM provider from a model name string.
 /// Mirrors the TypeScript `detectProviderFromModel()` in `ui/src/data/models.ts`.
@@ -1429,7 +1429,7 @@ fn generate_main_rs(project: &ProjectSchema) -> String {
 pub fn generate_runner_builder(project: &ProjectSchema, agent_var: &str) -> String {
     let mut code = String::new();
 
-    code.push_str("    // Build runner using typestate builder pattern (ADK 0.8.0)\n");
+    code.push_str("    // Build runner using typestate builder pattern (ADK 1.0.0)\n");
     code.push_str("    let session_service = Arc::new(InMemorySessionService::new());\n");
     code.push_str("    let runner = Runner::builder()\n");
     code.push_str(&format!(
@@ -4916,7 +4916,7 @@ fn generate_cargo_toml(project: &ProjectSchema) -> String {
         name = format!("project_{}", name);
     }
 
-    // Always use 0.8.0 — older versions are not supported by the current codegen
+    // Always use 1.0.0 — older versions are not supported by the current codegen
     let adk_version = DEFAULT_ADK_VERSION;
     let rust_edition = project.settings.rust_edition.as_deref().unwrap_or("2024");
 

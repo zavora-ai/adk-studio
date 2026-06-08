@@ -676,16 +676,16 @@ fn cargo_toml_has_core_dependencies() {
 }
 
 #[test]
-fn cargo_toml_defaults_to_adk_0_8_0() {
+fn cargo_toml_defaults_to_adk_1_0_0() {
     let mut agents = HashMap::new();
     agents.insert("agent".to_string(), llm_agent("Test."));
 
     let toml = get_cargo_toml(&project("test", agents));
-    assert!(toml.contains("adk-agent = \"0.8.0\""));
-    assert!(toml.contains("adk-core = \"0.8.0\""));
-    assert!(toml.contains("adk-model = { version = \"0.8.0\""));
-    assert!(toml.contains("adk-tool = \"0.8.0\""));
-    assert!(toml.contains("adk-graph = { version = \"0.8.0\""));
+    assert!(toml.contains("adk-agent = \"1.0.0\""));
+    assert!(toml.contains("adk-core = \"1.0.0\""));
+    assert!(toml.contains("adk-model = { version = \"1.0.0\""));
+    assert!(toml.contains("adk-tool = \"1.0.0\""));
+    assert!(toml.contains("adk-graph = { version = \"1.0.0\""));
 }
 
 #[test]

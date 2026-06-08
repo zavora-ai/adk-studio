@@ -3,7 +3,7 @@
 //! **Property 3: Read-Only Tools Are Inherently Read-Only**
 //! **Validates: Requirements 3.1, 3.2, 3.3**
 //!
-//! In ADK 0.8.0, `GoogleSearchTool` and `LoadArtifactsTool` are inherently read-only
+//! In ADK 0.8.2, `GoogleSearchTool` and `LoadArtifactsTool` are inherently read-only
 //! via their `is_read_only()` trait implementation. They do NOT need `.read_only(true)`
 //! called on them. The generated code should use `GoogleSearchTool::new()` and
 //! `LoadArtifactsTool::new()` without `.read_only(true)`.
@@ -226,7 +226,7 @@ proptest! {
     /// **Validates: Requirements 3.1, 3.3**
     ///
     /// Property 3: GoogleSearchTool is generated with just `::new()` — no `.read_only(true)`
-    /// because it is inherently read-only via its trait implementation in ADK 0.8.0.
+    /// because it is inherently read-only via its trait implementation in ADK 0.8.2.
     #[test]
     fn google_search_tool_no_read_only(
         project in arb_project_with_google_search()
@@ -246,14 +246,14 @@ proptest! {
         // Must NOT have .read_only(true) on GoogleSearchTool
         prop_assert!(
             !code.contains("GoogleSearchTool::new().read_only(true)"),
-            "GoogleSearchTool must NOT have .read_only(true) — it is inherently read-only in ADK 0.8.0"
+            "GoogleSearchTool must NOT have .read_only(true) — it is inherently read-only in ADK 0.8.2"
         );
     }
 
     /// **Validates: Requirements 3.2, 3.3**
     ///
     /// Property 3: LoadArtifactsTool is generated with just `::new()` — no `.read_only(true)`
-    /// because it is inherently read-only via its trait implementation in ADK 0.8.0.
+    /// because it is inherently read-only via its trait implementation in ADK 0.8.2.
     #[test]
     fn load_artifacts_tool_no_read_only(
         project in arb_project_with_load_artifacts()
@@ -273,7 +273,7 @@ proptest! {
         // Must NOT have .read_only(true) on LoadArtifactsTool
         prop_assert!(
             !code.contains("LoadArtifactsTool::new().read_only(true)"),
-            "LoadArtifactsTool must NOT have .read_only(true) — it is inherently read-only in ADK 0.8.0"
+            "LoadArtifactsTool must NOT have .read_only(true) — it is inherently read-only in ADK 0.8.2"
         );
     }
 

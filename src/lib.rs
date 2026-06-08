@@ -1,10 +1,10 @@
-//! ADK Studio - Visual development environment for ADK-Rust agents (v0.8.0)
+//! ADK Studio - Visual development environment for ADK-Rust agents (v1.0.0)
 //!
 //! Build-only architecture: Users create agents in UI, build to binary, run compiled code.
 //!
-//! ## ADK 0.8.0 Alignment
+//! ## ADK 1.0.0 Alignment
 //!
-//! - All generated code targets adk-rust 0.8.0 APIs
+//! - All generated code targets adk-rust 1.0.0 APIs
 //! - Tool trait gains `is_read_only()` and `is_concurrency_safe()` for parallel dispatch
 //! - `ToolExecutionStrategy::Auto` enables concurrent read-only tool execution
 //! - Runner supports typestate builder pattern via `Runner::builder()`

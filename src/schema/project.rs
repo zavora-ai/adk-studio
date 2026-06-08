@@ -5,7 +5,7 @@ use uuid::Uuid;
 use super::{AgentSchema, ToolConfig, ToolSchema, WorkflowSchema};
 use crate::codegen::action_nodes::ActionNodeConfig;
 
-const DEFAULT_ADK_VERSION: &str = "0.8.0";
+const DEFAULT_ADK_VERSION: &str = "1.0.0";
 
 /// Complete project schema
 #[derive(Debug, Clone, Serialize, Deserialize)]

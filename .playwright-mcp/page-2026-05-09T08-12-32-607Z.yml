@@ -1,0 +1,19 @@
+- generic [ref=e3]:
+  - banner [ref=e4]:
+    - heading "ADK ADK Studio v0.8.0" [level=1] [ref=e6]:
+      - img "ADK" [ref=e7]
+      - text: ADK Studio
+      - generic [ref=e8]: v0.8.0
+    - generic [ref=e9]:
+      - button "Deploy" [disabled] [ref=e10]
+      - button "⚙️" [ref=e11] [cursor=pointer]
+      - button "Switch to light mode" [ref=e12] [cursor=pointer]:
+        - img [ref=e13]
+  - main [ref=e19]:
+    - generic [ref=e20]:
+      - generic [ref=e21]:
+        - heading "Projects" [level=2] [ref=e22]
+        - generic [ref=e23]:
+          - button "🌐 Settings" [ref=e24] [cursor=pointer]
+          - button "+ New Project" [ref=e25] [cursor=pointer]
+      - generic [ref=e26]: Loading...

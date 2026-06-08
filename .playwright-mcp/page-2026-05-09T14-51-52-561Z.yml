@@ -1,0 +1,231 @@
+- generic [ref=e3]:
+  - banner [ref=e4]:
+    - generic [ref=e5]:
+      - heading "ADK ADK Studio v0.8.0" [level=1] [ref=e6]:
+        - img "ADK" [ref=e7]
+        - text: ADK Studio
+        - generic [ref=e8]: v0.8.0
+      - generic [ref=e72]: / dxcs
+    - generic [ref=e9]:
+      - button "Deploy" [ref=e10] [cursor=pointer]
+      - button "⚙️" [ref=e11] [cursor=pointer]
+      - button "Switch to dark mode" [active] [ref=e73] [cursor=pointer]:
+        - img [ref=e74]
+  - main [ref=e19]:
+    - generic [ref=e76]:
+      - generic [ref=e77]:
+        - generic [ref=e78]:
+          - img "ADK" [ref=e79]
+          - text: ADK Studio
+        - button "File" [ref=e312] [cursor=pointer]
+        - button "Templates" [ref=e314] [cursor=pointer]
+        - button "Help" [ref=e316] [cursor=pointer]
+        - generic [ref=e86]:
+          - generic [ref=e87]: "Project: dxcs"
+          - button "○ Not Built" [ref=e88]:
+            - generic [ref=e89]: ○
+            - generic [ref=e90]: Not Built
+          - button "🐛 Debug" [ref=e91] [cursor=pointer]:
+            - generic [ref=e92]: 🐛
+            - generic [ref=e93]: Debug
+      - generic [ref=e94]:
+        - generic [ref=e95]:
+          - generic [ref=e96]:
+            - heading "Agents" [level=3] [ref=e97]
+            - generic [ref=e98]:
+              - generic [ref=e99]: ⊕ LLM Agent
+              - generic [ref=e100]: ⊕ Sequential Agent
+              - generic [ref=e101]: ⊕ Loop Agent
+              - generic [ref=e102]: ⊕ Parallel Agent
+              - generic [ref=e103]: ⊕ Router Agent
+          - generic [ref=e104]:
+            - heading "Actions" [level=3] [ref=e105]
+            - generic [ref=e106]:
+              - generic [ref=e107]: Entry
+              - generic "Drag or click to add Trigger node" [ref=e109]: 🎯 Trigger
+            - generic [ref=e110]:
+              - generic [ref=e111]: Data
+              - generic [ref=e112]:
+                - generic "Drag or click to add Set node" [ref=e113]: 📝 Set
+                - generic "Drag or click to add Transform node" [ref=e114]: ⚙️ Transform
+            - generic [ref=e115]:
+              - generic [ref=e116]: Control
+              - generic [ref=e117]:
+                - generic "Drag or click to add Switch node" [ref=e118]: 🔀 Switch
+                - generic "Drag or click to add Loop node" [ref=e119]: 🔄 Loop
+                - generic "Drag or click to add Merge node" [ref=e120]: 🔗 Merge
+                - generic "Drag or click to add Wait node" [ref=e121]: ⏱️ Wait
+            - generic [ref=e122]:
+              - generic [ref=e123]: Integration
+              - generic [ref=e124]:
+                - generic "Drag or click to add HTTP node" [ref=e125]: 🌐 HTTP
+                - generic "Drag or click to add Database node" [ref=e126]: 🗄️ Database
+                - generic "Drag or click to add Email node" [ref=e127]: 📧 Email
+            - generic [ref=e128]:
+              - generic [ref=e129]: Code
+              - generic "Drag or click to add Code node" [ref=e131]: 💻 Code
+          - generic [ref=e132]:
+            - heading "Tools" [level=3] [ref=e133]
+            - generic [ref=e134]:
+              - generic [ref=e135]:
+                - generic [ref=e136]: ƒ
+                - generic [ref=e137]: Function Tool
+              - generic [ref=e138]:
+                - generic [ref=e139]: 🔌
+                - generic [ref=e140]: MCP Tool
+              - generic [ref=e141]:
+                - generic [ref=e142]: 🌐
+                - generic [ref=e143]: Browser Tool
+              - generic [ref=e144]:
+                - generic [ref=e145]: ⏹
+                - generic [ref=e146]: Exit Loop
+              - generic [ref=e147]:
+                - generic [ref=e148]: 🔍
+                - generic [ref=e149]: Google Search
+              - generic [ref=e150]:
+                - generic [ref=e151]: 📦
+                - generic [ref=e152]: Load Artifact
+          - generic [ref=e153]:
+            - button "📄 View Code" [ref=e154] [cursor=pointer]
+            - generic [ref=e155]:
+              - button "🔨 Build Required" [ref=e156] [cursor=pointer]
+              - button "⚡" [ref=e157] [cursor=pointer]
+            - button "Hide Console" [ref=e158] [cursor=pointer]
+            - button "⚙️ Settings" [ref=e159] [cursor=pointer]
+            - button "Back" [ref=e160] [cursor=pointer]
+        - generic [ref=e161]:
+          - application [ref=e162]:
+            - generic [ref=e164] [cursor=pointer]:
+              - generic:
+                - generic:
+                  - img:
+                    - group "Edge from manual_trigger to START" [ref=e165]
+                  - img:
+                    - group "Edge from START to chat_agent" [ref=e168]
+                  - img:
+                    - group "Edge from chat_agent to END" [ref=e171]
+                - generic:
+                  - group [ref=e174]:
+                    - generic [ref=e175]:
+                      - generic [ref=e176]:
+                        - generic [ref=e177]: 🎯
+                        - generic [ref=e178]: Manual Trigger
+                        - generic [ref=e179]: trigger
+                      - generic [ref=e180]:
+                        - generic [ref=e181]:
+                          - generic [ref=e182]: 👆
+                          - generic [ref=e183]: Manual
+                        - generic [ref=e184]: Click to run
+                  - group [ref=e186]:
+                    - generic [ref=e190]:
+                      - generic [ref=e191]: ▶
+                      - generic [ref=e192]: START
+                  - group [ref=e195]:
+                    - generic [ref=e197]:
+                      - generic [ref=e198]: ⏹
+                      - generic [ref=e199]: END
+                  - group [ref=e202]:
+                    - generic [ref=e203]:
+                      - generic [ref=e206]:
+                        - generic [ref=e207]: 🤖
+                        - generic [ref=e208]: chat_agent
+                        - generic [ref=e209]: agent
+                      - generic [ref=e210]:
+                        - generic [ref=e211]:
+                          - generic [ref=e212]: 🧠
+                          - generic [ref=e213]: o3
+                        - generic "google_search" [ref=e216]:
+                          - generic [ref=e217]: 🔍
+                          - generic [ref=e218]: google_sear…
+            - img
+            - generic "Control Panel" [ref=e221]:
+              - button "Zoom In" [ref=e222] [cursor=pointer]:
+                - img [ref=e223]
+              - button "Zoom Out" [ref=e225] [cursor=pointer]:
+                - img [ref=e226]
+              - button "Fit View" [ref=e228] [cursor=pointer]:
+                - img [ref=e229]
+              - button "Toggle Interactivity" [ref=e231] [cursor=pointer]:
+                - img [ref=e232]
+            - img "Mini Map" [ref=e235]
+          - generic [ref=e241]:
+            - button "✋ Free" [ref=e242] [cursor=pointer]:
+              - generic [ref=e243]: ✋
+              - text: Free
+            - button "↔ LR" [ref=e244] [cursor=pointer]:
+              - generic [ref=e245]: ↔
+              - text: LR
+            - button "⤢ Arrange" [ref=e246] [cursor=pointer]:
+              - generic [ref=e247]: ⤢
+              - text: Arrange
+            - button "⊞ Snap" [ref=e248] [cursor=pointer]:
+              - generic [ref=e249]: ⊞
+              - text: Snap
+            - combobox "Grid size in pixels" [ref=e250]:
+              - option "10px"
+              - option "20px" [selected]
+              - option "40px"
+            - button "🔀 Flow Off" [ref=e251] [cursor=pointer]:
+              - generic [ref=e252]: 🔀
+              - text: Flow Off
+            - button "⊡ Fit" [ref=e253] [cursor=pointer]:
+              - generic [ref=e254]: ⊡
+              - text: Fit
+            - button "🗺️ Map" [ref=e255] [cursor=pointer]:
+              - generic [ref=e256]: 🗺️
+              - text: Map
+            - generic "Current zoom level (Ctrl+Plus/Minus to zoom)" [ref=e257]:
+              - generic [ref=e258]: 🔍
+              - text: 90%
+            - button "▶️ Run" [disabled] [ref=e261]:
+              - generic [ref=e262]: ▶️
+              - text: Run
+      - generic [ref=e264]:
+        - generic [ref=e265]:
+          - generic [ref=e266]:
+            - button "💬 Chat" [ref=e267] [cursor=pointer]
+            - button "📋 Events" [ref=e268] [cursor=pointer]
+            - generic [ref=e269]: ⚪
+            - generic [ref=e270]: ⚪
+          - generic [ref=e271]:
+            - button "🗑️ Clear" [ref=e272] [cursor=pointer]
+            - button "➕ New" [ref=e273] [cursor=pointer]
+            - button "▼" [ref=e274] [cursor=pointer]
+        - generic [ref=e277]:
+          - paragraph [ref=e278]: 🎉 Workflow ready!
+          - paragraph [ref=e279]:
+            - text: Click
+            - strong [ref=e280]: Build
+            - text: to compile your workflow, then you can start chatting.
+        - generic [ref=e282]:
+          - textbox "⚙️ Click Build to compile your workflow" [disabled] [ref=e283]
+          - button "🔨 Build" [ref=e284] [cursor=pointer]
+  - generic [ref=e286]:
+    - generic [ref=e287]:
+      - heading "✗ Deployment Failed" [level=2] [ref=e317]
+      - button "×" [ref=e319] [cursor=pointer]
+    - generic [ref=e290]:
+      - generic [ref=e320]:
+        - generic [ref=e321]: ✓
+        - generic [ref=e323]: Generating deployment manifest
+      - generic [ref=e324]:
+        - generic [ref=e325]: ✓
+        - generic [ref=e327]: Building agent binary
+      - generic [ref=e328]:
+        - generic [ref=e329]: ✗
+        - generic [ref=e330]:
+          - generic [ref=e331]: Starting local ADK platform
+          - generic [ref=e332]: "http error: error sending request for url (http://127.0.0.1:8090/api/v1/auth/login)"
+      - generic [ref=e333]:
+        - generic [ref=e334]: ○
+        - generic [ref=e336]: Deploying to local platform
+      - generic [ref=e337]: "http error: error sending request for url (http://127.0.0.1:8090/api/v1/auth/login)"
+      - generic [ref=e338]:
+        - generic [ref=e339]: 💡 Platform not reachable
+        - paragraph [ref=e340]:
+          - text: The ADK platform could not be started or reached. Ensure
+          - code [ref=e341]: adk-rust
+          - text: "is installed:"
+        - generic [ref=e342]: cargo install adk-cli
+        - paragraph [ref=e343]: ✓ Manifest and runtime code were generated successfully.
+    - button "Close" [ref=e344] [cursor=pointer]

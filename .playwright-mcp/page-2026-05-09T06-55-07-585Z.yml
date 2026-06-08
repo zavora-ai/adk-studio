@@ -1,0 +1,305 @@
+- generic [ref=e3]:
+  - banner [ref=e4]:
+    - generic [ref=e5]:
+      - heading "ADK ADK Studio v0.8.0" [level=1] [ref=e6]:
+        - img "ADK" [ref=e7]
+        - text: ADK Studio
+        - generic [ref=e8]: v0.8.0
+      - generic [ref=e1129]: / dxcs
+    - generic [ref=e9]:
+      - button "Deploy" [ref=e10] [cursor=pointer]
+      - button "⚙️" [ref=e11] [cursor=pointer]
+      - button "Switch to dark mode" [ref=e1525] [cursor=pointer]:
+        - img [ref=e1526]
+  - main [ref=e19]:
+    - generic [ref=e1130]:
+      - generic [ref=e1131]:
+        - generic [ref=e1132]:
+          - img "ADK" [ref=e1133]
+          - text: ADK Studio
+        - button "File" [ref=e1920] [cursor=pointer]
+        - button "Templates" [ref=e1922] [cursor=pointer]
+        - button "Help" [ref=e1924] [cursor=pointer]
+        - generic [ref=e1140]:
+          - generic [ref=e1141]: "Project: dxcs"
+          - button "✗ Failed" [ref=e1925] [cursor=pointer]:
+            - generic [ref=e1926]: ✗
+            - generic [ref=e1927]: Failed
+          - button "🐛 Debug" [ref=e1145] [cursor=pointer]:
+            - generic [ref=e1146]: 🐛
+            - generic [ref=e1147]: Debug
+      - generic [ref=e1148]:
+        - generic [ref=e1149]:
+          - generic [ref=e1150]:
+            - heading "Agents" [level=3] [ref=e1151]
+            - generic [ref=e1152]:
+              - generic [ref=e1153]: ⊕ LLM Agent
+              - generic [ref=e1154]: ⊕ Sequential Agent
+              - generic [ref=e1155]: ⊕ Loop Agent
+              - generic [ref=e1156]: ⊕ Parallel Agent
+              - generic [ref=e1157]: ⊕ Router Agent
+          - generic [ref=e1158]:
+            - heading "Actions" [level=3] [ref=e1159]
+            - generic [ref=e1160]:
+              - generic [ref=e1161]: Entry
+              - generic "Drag or click to add Trigger node" [ref=e1163]: 🎯 Trigger
+            - generic [ref=e1164]:
+              - generic [ref=e1165]: Data
+              - generic [ref=e1166]:
+                - generic "Drag or click to add Set node" [ref=e1167]: 📝 Set
+                - generic "Drag or click to add Transform node" [ref=e1168]: ⚙️ Transform
+            - generic [ref=e1169]:
+              - generic [ref=e1170]: Control
+              - generic [ref=e1171]:
+                - generic "Drag or click to add Switch node" [ref=e1172]: 🔀 Switch
+                - generic "Drag or click to add Loop node" [ref=e1173]: 🔄 Loop
+                - generic "Drag or click to add Merge node" [ref=e1174]: 🔗 Merge
+                - generic "Drag or click to add Wait node" [ref=e1175]: ⏱️ Wait
+            - generic [ref=e1176]:
+              - generic [ref=e1177]: Integration
+              - generic [ref=e1178]:
+                - generic "Drag or click to add HTTP node" [ref=e1179]: 🌐 HTTP
+                - generic "Drag or click to add Database node" [ref=e1180]: 🗄️ Database
+                - generic "Drag or click to add Email node" [ref=e1181]: 📧 Email
+            - generic [ref=e1182]:
+              - generic [ref=e1183]: Code
+              - generic "Drag or click to add Code node" [ref=e1185]: 💻 Code
+          - generic [ref=e1186]:
+            - heading "Tools" [level=3] [ref=e1187]
+            - generic [ref=e1188]:
+              - generic [ref=e1189]:
+                - generic [ref=e1190]: ƒ
+                - generic [ref=e1191]: Function Tool
+              - generic [ref=e1192]:
+                - generic [ref=e1193]: 🔌
+                - generic [ref=e1194]: MCP Tool
+              - generic [ref=e1195]:
+                - generic [ref=e1196]: 🌐
+                - generic [ref=e1197]: Browser Tool
+              - generic [ref=e1198]:
+                - generic [ref=e1199]: ⏹
+                - generic [ref=e1200]: Exit Loop
+              - generic [ref=e1201]:
+                - generic [ref=e1202]: 🔍
+                - generic [ref=e1203]: Google Search
+                - generic [ref=e1546]: ✓
+              - generic [ref=e1204]:
+                - generic [ref=e1205]: 📦
+                - generic [ref=e1206]: Load Artifact
+          - generic [ref=e1207]:
+            - button "📄 View Code" [ref=e1208] [cursor=pointer]
+            - generic [ref=e1209]:
+              - button "🔨 Build Required" [ref=e1928] [cursor=pointer]
+              - button "⚡" [ref=e1211] [cursor=pointer]
+            - button "Hide Console" [ref=e1212] [cursor=pointer]
+            - button "⚙️ Settings" [ref=e1213] [cursor=pointer]
+            - button "Back" [ref=e1214] [cursor=pointer]
+        - generic [ref=e1215]:
+          - application [ref=e1216]:
+            - generic [ref=e1218] [cursor=pointer]:
+              - generic:
+                - generic:
+                  - img:
+                    - group "Edge from manual_trigger to START" [ref=e1929]
+                  - img:
+                    - group "Edge from START to chat_agent" [ref=e1932]
+                  - img:
+                    - group "Edge from chat_agent to END" [ref=e1935]
+                - generic:
+                  - group [ref=e1228]:
+                    - generic [ref=e1229]:
+                      - generic [ref=e1230]:
+                        - generic [ref=e1231]: 🎯
+                        - generic [ref=e1232]: Manual Trigger
+                        - generic [ref=e1233]: trigger
+                      - generic [ref=e1234]:
+                        - generic [ref=e1235]:
+                          - generic [ref=e1236]: 👆
+                          - generic [ref=e1237]: Manual
+                        - generic [ref=e1238]: Click to run
+                  - group [ref=e1240]:
+                    - generic [ref=e1244]:
+                      - generic [ref=e1245]: ▶
+                      - generic [ref=e1246]: START
+                  - group [ref=e1249]:
+                    - generic [ref=e1251]:
+                      - generic [ref=e1252]: ⏹
+                      - generic [ref=e1253]: END
+                  - group [ref=e1256]:
+                    - generic [ref=e1257]:
+                      - generic [ref=e1260]:
+                        - generic [ref=e1261]: 🤖
+                        - generic [ref=e1262]: chat_agent
+                        - generic [ref=e1263]: agent
+                      - generic [ref=e1264]:
+                        - generic [ref=e1265]:
+                          - generic [ref=e1266]: 🧠
+                          - generic [ref=e1267]: o3
+                        - generic "google_search" [ref=e1270]:
+                          - generic [ref=e1271]: 🔍
+                          - generic [ref=e1272]: google_sear…
+            - img
+            - generic "Control Panel" [ref=e1275]:
+              - button "Zoom In" [ref=e1276] [cursor=pointer]:
+                - img [ref=e1277]
+              - button "Zoom Out" [ref=e1279] [cursor=pointer]:
+                - img [ref=e1280]
+              - button "Fit View" [ref=e1282] [cursor=pointer]:
+                - img [ref=e1283]
+              - button "Toggle Interactivity" [ref=e1285] [cursor=pointer]:
+                - img [ref=e1286]
+            - img "Mini Map" [ref=e1289]
+          - generic [ref=e1295]:
+            - button "✋ Free" [ref=e1296] [cursor=pointer]:
+              - generic [ref=e1297]: ✋
+              - text: Free
+            - button "↔ LR" [ref=e1298] [cursor=pointer]:
+              - generic [ref=e1299]: ↔
+              - text: LR
+            - button "⤢ Arrange" [ref=e1300] [cursor=pointer]:
+              - generic [ref=e1301]: ⤢
+              - text: Arrange
+            - button "⊞ Snap" [ref=e1302] [cursor=pointer]:
+              - generic [ref=e1303]: ⊞
+              - text: Snap
+            - combobox "Grid size in pixels" [ref=e1304]:
+              - option "10px"
+              - option "20px" [selected]
+              - option "40px"
+            - button "🔀 Flow Off" [ref=e1305] [cursor=pointer]:
+              - generic [ref=e1306]: 🔀
+              - text: Flow Off
+            - button "⊡ Fit" [ref=e1307] [cursor=pointer]:
+              - generic [ref=e1308]: ⊡
+              - text: Fit
+            - button "🗺️ Map" [ref=e1309] [cursor=pointer]:
+              - generic [ref=e1310]: 🗺️
+              - text: Map
+            - generic "Current zoom level (Ctrl+Plus/Minus to zoom)" [ref=e1311]:
+              - generic [ref=e1312]: 🔍
+              - text: 90%
+            - button "▶️ Run" [disabled] [ref=e1942]:
+              - generic [ref=e1316]: ▶️
+              - text: Run
+        - generic [ref=e1547]:
+          - generic [ref=e1548]:
+            - heading "chat_agent ✎" [level=3] [ref=e1549] [cursor=pointer]
+            - button "Close" [ref=e1550] [cursor=pointer]
+          - generic [ref=e1551]:
+            - generic [ref=e1552]:
+              - generic [ref=e1553]: Basic
+              - generic [ref=e1554]:
+                - generic [ref=e1555]:
+                  - generic [ref=e1556]: Model
+                  - generic [ref=e1557]:
+                    - generic [ref=e1558]:
+                      - generic [ref=e1559]: Provider
+                      - combobox [ref=e1560]:
+                        - option "✨ Google Gemini"
+                        - option "🤖 OpenAI" [selected]
+                        - option "🎭 Anthropic Claude"
+                        - option "🔍 DeepSeek"
+                        - option "⚡ Groq"
+                        - option "🦙 Ollama (Local)"
+                        - option "🎆 Fireworks AI"
+                        - option "🤝 Together AI"
+                        - option "🌬️ Mistral AI"
+                        - option "🔮 Perplexity"
+                        - option "🧪 Cerebras"
+                        - option "⚙️ SambaNova"
+                        - option "🪨 Amazon Bedrock"
+                        - option "☁️ Azure AI"
+                        - option "𝕏 xAI"
+                        - option "🌐 OpenRouter"
+                    - generic [ref=e1561]:
+                      - generic [ref=e1562]: Model
+                      - button "o3 ▼" [ref=e1943] [cursor=pointer]:
+                        - generic [ref=e1730]: o3
+                        - generic [ref=e1731]: ▼
+                    - generic [ref=e1944]:
+                      - generic [ref=e1945]: Reasoning Options
+                      - generic [ref=e1946]:
+                        - generic [ref=e1947]: Reasoning Effort
+                        - generic [ref=e1948]:
+                          - button "low" [ref=e1949] [cursor=pointer]
+                          - button "medium" [ref=e1950] [cursor=pointer]
+                          - button "high" [ref=e1951] [cursor=pointer]
+                    - generic [ref=e1732]:
+                      - generic [ref=e1733]: Advanced reasoning model for complex problem solving
+                      - generic [ref=e1734]:
+                        - generic "Context window" [ref=e1735]: 📏 200K
+                        - generic "text" [ref=e1736]: 📝
+                        - generic "vision" [ref=e1737]: 👁️
+                        - generic "code" [ref=e1739]: 💻
+                        - generic "reasoning" [ref=e1740]: 🧠
+                        - generic "tools" [ref=e1741]: 🔧
+                - generic [ref=e1578]:
+                  - generic [ref=e1579]: Instruction
+                  - textbox "You are a helpful assistant..." [ref=e1580]: You are a helpful, friendly assistant. Answer questions clearly and concisely. Use Google Search when you need current information or facts you're unsure about. Be conversational but informative.
+                - generic [ref=e1581]:
+                  - generic [ref=e1582]:
+                    - text: Description
+                    - generic [ref=e1583]: (Optional agent description)
+                  - textbox "What this agent does" [ref=e1584]
+            - generic [ref=e1585]:
+              - generic [ref=e1586]: Tools
+              - generic [ref=e1589] [cursor=pointer]:
+                - text: 🔍 Google Search
+                - generic [ref=e1590]: ⚙
+                - button "×" [ref=e1591]
+            - generic [ref=e1592]:
+              - button "▼ Resilience & Execution" [ref=e1598] [cursor=pointer]:
+                - generic [ref=e1594]: ▼
+                - text: Resilience & Execution
+              - generic [ref=e1599]:
+                - generic [ref=e1600]:
+                  - generic [ref=e1601]: Tool Execution Strategy
+                  - combobox [ref=e1602]:
+                    - option "Auto (concurrent read-only)" [selected]
+                    - option "Sequential"
+                    - option "Parallel"
+                - generic [ref=e1603]:
+                  - generic [ref=e1604]: Tool Timeout (seconds)
+                  - spinbutton [ref=e1605]
+                - generic [ref=e1606]:
+                  - generic [ref=e1607]: Max LLM Iterations
+                  - spinbutton [ref=e1608]
+                - generic [ref=e1609]:
+                  - generic [ref=e1610]: Tool Retry Budget
+                  - spinbutton [ref=e1611]
+                - generic [ref=e1612]:
+                  - generic [ref=e1613]: Circuit Breaker Threshold
+                  - spinbutton [ref=e1614]
+                - generic [ref=e1615]:
+                  - generic [ref=e1616]: Tool Confirmation(require approval)
+                  - generic [ref=e1618] [cursor=pointer]:
+                    - checkbox "🔍 Google Search" [ref=e1619]
+                    - generic [ref=e1620]: 🔍 Google Search
+            - button "▶ Advanced Settings" [ref=e1596] [cursor=pointer]:
+              - generic [ref=e1597]: ▶
+              - text: Advanced Settings
+      - generic [ref=e1318]:
+        - generic [ref=e1319]:
+          - generic [ref=e1320]:
+            - button "💬 Chat" [ref=e1321] [cursor=pointer]
+            - button "📋 Events" [ref=e1322] [cursor=pointer]
+            - generic [ref=e1323]: ❌
+            - generic [ref=e1324]: ⚪
+          - generic [ref=e1325]:
+            - button "🗑️ Clear" [ref=e1326] [cursor=pointer]
+            - button "➕ New" [ref=e1327] [cursor=pointer]
+            - button "▼" [ref=e1328] [cursor=pointer]
+        - generic [ref=e1331]:
+          - paragraph [ref=e1332]: 🎉 Workflow ready!
+          - paragraph [ref=e1333]:
+            - text: Click
+            - strong [ref=e1334]: Build
+            - text: to compile your workflow, then you can start chatting.
+        - generic [ref=e1336]:
+          - textbox "❌ Build failed - check errors and rebuild" [disabled] [ref=e1952]
+          - button "🔨 Build" [ref=e1953] [cursor=pointer]
+      - generic [ref=e1684]:
+        - generic [ref=e1685]:
+          - heading "✗ Build Failed" [level=2] [ref=e1954]
+          - button "×" [ref=e1687] [cursor=pointer]
+        - generic [ref=e1689]: "Starting cargo build... Compiling dxcs v0.1.0 (/private/var/folders/6r/n_qn86p536z5lp0d64x66bbm0000gn/T/adk-studio-builds/dxcs) error[E0432]: unresolved import `adk_runner::ToolExecutionStrategy` --> src/main.rs:37:26 | 37 | use adk_runner::{Runner, ToolExecutionStrategy}; | ^^^^^^^^^^^^^^^^^^^^^ no `ToolExecutionStrategy` in the root | = help: consider importing this enum instead: adk_core::ToolExecutionStrategy error[E0599]: no method named `read_only` found for struct `GoogleSearchTool` in the current scope --> src/main.rs:56:83 | 56 | chat_agent_builder = chat_agent_builder.tool(Arc::new(GoogleSearchTool::new().read_only(true))); | ^^^^^^^^^ | help: there is a method `is_read_only` with a similar name, but with different arguments --> /Users/jameskaranja/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/adk-core-0.6.0/src/tool.rs:98:5 | 98 | fn is_read_only(&self) -> bool { | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ error[E0061]: this function takes 0 arguments but 3 arguments were supplied --> src/main.rs:92:18 | 92 | let runner = Runner::builder(\"dxcs\", graph, session_service) | ^^^^^^^^^^^^^^^ ------ ----- --------------- unexpected argument #3 of type `InMemorySessionService` | | | | | unexpected argument #2 of type `CompiledGraph` | unexpected argument #1 of type `&'static str` | note: associated function defined here --> /Users/jameskaranja/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/adk-runner-0.6.0/src/runner.rs:83:12 | 83 | pub fn builder() -> crate::builder::RunnerConfigBuilder< | ^^^^^^^ help: remove the extra arguments | 92 - let runner = Runner::builder(\"dxcs\", graph, session_service) 92 + let runner = Runner::builder() | error[E0599]: no method named `tool_execution_strategy` found for struct `RunnerConfigBuilder<A, G, S>` in the current scope --> src/main.rs:93:10 | 92 | let runner = Runner::builder(\"dxcs\", graph, session_service) | __________________- 93 | | .tool_execution_strategy(ToolExecutionStrategy::Auto) | | -^^^^^^^^^^^^^^^^^^^^^^^ method not found in `RunnerConfigBuilder<NoAppName, NoAgent, NoSessionService>` | |_________| | Some errors have detailed explanations: E0061, E0432, E0599. For more information about an error, try `rustc --explain E0061`. error: could not compile `dxcs` (bin \"dxcs\") due to 4 previous errors ✗ Build failed after 0.5s Error: Build failed"
