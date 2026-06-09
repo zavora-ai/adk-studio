@@ -36,7 +36,7 @@ export interface GlobalSettings {
 
 export const DEFAULT_GLOBAL_SETTINGS: GlobalSettings = {
   defaultProvider: 'gemini',
-  defaultModel: 'gemini-2.5-flash',
+  defaultModel: 'gemini-3.1-flash-lite-preview',
   adkVersion: '1.0.0',
   rustEdition: '2024',
   theme: 'dark',
